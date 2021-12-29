@@ -1,0 +1,46 @@
+# HTTP Server
+[server]
+	Address     = ":8200"
+	ServerRoot  = "public"
+	ServerAgent = "gf-admin"
+	LogPath     = "/tmp/log/gf-app/server"
+	sessionPath =  "temp/sessions"    # Session文件存储目录
+  openapiPath =  "/api.json"
+  swaggerPath =  "/swagger"
+[upload]
+  path        = "upload"
+# Logger.
+[logger]
+    Path        = "/tmp/log/gf-app"
+    Level       = "all"
+    Stdout      = true
+
+# Database.
+[database]
+    link  = "mysql:root:secret@tcp(127.0.0.1:3306)/gf-admin"
+    debug = true
+    # Database logger.
+    [database.logger]
+        Path   = "/tmp/log/gf-app/sql"
+        Level  = "all"
+        Stdout = true
+# Redis数据库配置
+[redis]
+  [redis.default]
+    host = "127.0.0.1"
+    port = "6379"
+    db = 0
+  [redis.session]
+    host = "127.0.0.1"
+    port = "6379"
+    db = 1
+
+
+[[gfcli.gen.dao]]
+   link     = "mysql:root:secret@tcp(127.0.0.1:3306)/gf-admin"
+   removePrefix = "ga_"
+   overwriteDao = true
+   modelFile = "all.go"
+   jsonCase = "snake"
+
+
