@@ -21,15 +21,18 @@ type AdminMenuDao struct {
 type AdminMenuColumns struct {
 	Id                 string //
 	Name               string // 菜单名称
-	Path               string // 请求后端路径，可以是外链
+	Path               string // 前端路由地址，可以是外链
 	ParentId           string // 父id
-	Identification     string // 权限标识符
+	Identification     string // 后端权限标识符
+	Method             string // 请求方法
 	FrontComponentPath string // 前端组件路径
 	Icon               string // 菜单图标
 	Sort               string // 显示顺序，越小越靠前
 	Status             string // 状态 normal 正常 disabled 禁用
 	CreatedAt          string // 创建时间
 	UpdatedAt          string // 更新时间
+	Type               string // 菜单类型
+	LinkType           string //
 }
 
 //  adminMenuColumns holds the columns for table ga_admin_menu.
@@ -39,12 +42,15 @@ var adminMenuColumns = AdminMenuColumns{
 	Path:               "path",
 	ParentId:           "parent_id",
 	Identification:     "identification",
+	Method:             "method",
 	FrontComponentPath: "front_component_path",
 	Icon:               "icon",
 	Sort:               "sort",
 	Status:             "status",
 	CreatedAt:          "created_at",
 	UpdatedAt:          "updated_at",
+	Type:               "type",
+	LinkType:           "link_type",
 }
 
 // NewAdminMenuDao creates and returns a new DAO object for table data access.

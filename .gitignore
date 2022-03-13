@@ -18,3 +18,7 @@ main
 gf-empty
 .vscode
 go.sum
+runtime/
+public/upload
+*.log
+test/
