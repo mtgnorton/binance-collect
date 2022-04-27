@@ -6,7 +6,6 @@ import (
 	"gf-admin/app/system/admin/internal/controller"
 	"gf-admin/app/system/admin/internal/service"
 	"gf-admin/utility/response"
-	"github.com/gogf/gf/os/glog"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -56,6 +55,7 @@ func Run(ctx context.Context) {
 	// 前台系统路由注册
 	s.Group(prefix.String(), func(group *ghttp.RouterGroup) {
 
+		// 使用传统路由方式绑定websocket请求
 		group.ALL("/ws", controller.Ws.Ws)
 
 		group.Group("/", func(group *ghttp.RouterGroup) {
@@ -63,19 +63,21 @@ func Run(ctx context.Context) {
 				shared.Middleware.Ctx,
 				service.Middleware.ResponseHandler,
 			)
+			//无需登录验证的路由
 
 			group.Bind(controller.NoAuth)
 
 			group.Group("/", func(group *ghttp.RouterGroup) {
-				//登录验证路由
-				service.AdminTokenInstance.Middleware(group)
+
+				//需要登录验证的路由
+				service.AdminTokenInstance.LoadConfig().Middleware(group)
 
 				group.Middleware(service.Middleware.Auth)
 
 				group.Bind(controller.Personal)
 				group.Bind(controller.Global)
 
-				// 权限验证路由
+				// 需要权限验证的路由
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Middleware(service.Middleware.Permission)
 
@@ -83,6 +85,7 @@ func Run(ctx context.Context) {
 						controller.Administrator,
 						controller.Role,
 						controller.Menu,
+						controller.Config,
 					)
 				})
 			})
@@ -96,17 +99,19 @@ func Run(ctx context.Context) {
 
 	s.BindHookHandlerByMap("/*", map[string]ghttp.HandlerFunc{
 		ghttp.HookBeforeServe: func(r *ghttp.Request) {
-			glog.Println(ghttp.HookBeforeServe)
+			g.Log().Debug(ctx, ghttp.HookBeforeServe)
 			r.SetParam("key1", "v11")
 			r.GetRequest("key1")
 		},
 	})
 
+	controller.Ws.MonitorSystem(ctx)
 	// 启动Http Server
 	s.Run()
 	return
 
 }
+
 func sessionConfig(s *ghttp.Server) {
 
 	err := s.SetConfigWithMap(g.Map{

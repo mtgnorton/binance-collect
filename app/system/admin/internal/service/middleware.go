@@ -1,12 +1,13 @@
 package service
 
 import (
+	"context"
 	"gf-admin/utility/response"
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gvalid"
 	"reflect"
@@ -14,13 +15,19 @@ import (
 
 // 中间件管理服务
 var (
-	Middleware = serviceMiddleware{
-		IgnoreAuthUrls: g.Cfg().MustGet(gctx.New(), "casbin.ignoreUrls").Strings(),
-	}
+	Middleware = serviceMiddleware{}
 )
 
 type serviceMiddleware struct {
 	IgnoreAuthUrls []string
+}
+
+func (s *serviceMiddleware) GetIgnoreAuthUrls() []string {
+	if s.IgnoreAuthUrls == nil {
+		s.IgnoreAuthUrls = g.Cfg().MustGet(context.TODO(), "casbin.ignoreUrls").Strings()
+	}
+	return s.IgnoreAuthUrls
+
 }
 
 // 返回处理中间件
@@ -108,12 +115,11 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 
 	path := gstr.Replace(url, prefix.String(), "")
 	g.Log("auth").Debugf(r.Context(), "权限认证,用户为:%s,path为:%s,method为:%s", administrator.Username, path, method)
-
 	//fmt.Println(s.IgnoreAuthUrls)
-	//if garray.NewStrArrayFrom(s.IgnoreAuthUrls, true).ContainsI(path) {
-	//	r.Middleware.Next()
-	//	return
-	//}
+	if garray.NewStrArrayFrom(s.GetIgnoreAuthUrls(), true).ContainsI(path) {
+		r.Middleware.Next()
+		return
+	}
 
 	isAllow, err := Enforcer.Auth(administrator.Username, path, method)
 	if err != nil || !isAllow {

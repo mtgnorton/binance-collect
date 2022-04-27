@@ -4,11 +4,11 @@
 	ServerAgent = "gf-admin"
 	LogPath     = "runtime/server"
 	sessionPath =  "temp/sessions"    # Session文件存储目录
-  openapiPath =  "/api.json"
-  swaggerPath =  "/swagger"
-  prefix      =  "/admin/api"
+    openapiPath =  "/api.json"
+    swaggerPath =  "/swagger"
+    prefix      =  "/admin/api"
 
-  ServerRoot  = "public"
+    ServerRoot  = "public"
 	#indexFiles          = ["index.html","index.htm"]   # 自动首页静态文件检索。默认为["index.html", "index.htm"]
 	indexFolder         = false                        # 当访问静态文件目录时，是否展示目录下的文件列表。默认关闭，那么请求将返回403
 #	searchPaths         = ["/home/www","/var/lib/www"] # 提供静态文件服务时额外的文件搜索路径，当根路径找不到时则按照顺序在搜索目录查找。默认关闭
@@ -41,7 +41,7 @@
     [database.logger]
         Path   = "runtime/sql"
         Level  = "all"
-        Stdout = true
+        Stdout = false
 
 [token]
     CacheMode = "cache" #cache是使用默认缓存，redis使用redis
@@ -51,7 +51,6 @@
 # 的一半
     EncryptKey = "noworldcanexpressmywholehearted1" #aes加密key,key的长度必须是16/24/32位
     MultiLogin = true #是否支持多点登录，默认false
-
 [casbin]
     driverName = "mysql"
     dataSourceName = "root:secret@tcp(127.0.0.1:3306)/gf-admin"
@@ -62,11 +61,11 @@
   [redis.default]
     host = "127.0.0.1"
     port = "6379"
-    db = 0
+    db = 2
   [redis.session]
     host = "127.0.0.1"
     port = "6379"
-    db = 1
+    db = 3
 
 
 [[gfcli.gen.dao]]

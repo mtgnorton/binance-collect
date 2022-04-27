@@ -9,5 +9,6 @@ import (
 //初始化admin用户
 
 func main() {
+
 	cmd.Run(gctx.New())
 }

@@ -57,7 +57,7 @@ CREATE TABLE `ga_admin_menu`
     `id`                   int(11) unsigned NOT NULL AUTO_INCREMENT,
     `name`                 varchar(20)      NOT NULL COMMENT '菜单名称',
     `type`                 varchar(12)      not null comment '菜单类型 directory:目录，link:链接,operation:操作',
-    `link_type`          varchar(10)      not null default 'internal' comment '链接类型：internal：本地，external:外部',
+    `link_type`            varchar(10)      not null default 'internal' comment '链接类型：internal：本地，external:外部',
     `front_path`           varchar(100)     not null default '' comment '前端路由地址，可以是外链',
     `parent_id`            int(11) unsigned NOT NULL default 0 comment '父id',
     `identification`       varchar(40)      NOT NULL default '' COMMENT '后端权限标识符',
@@ -90,6 +90,8 @@ CREATE TABLE `ga_role_menu`
 
 
 
+DROP Table if exists `ga_casbin_rule`;
+
 CREATE TABLE `ga_casbin_rule`
 (
     `ptype` varchar(10)  DEFAULT NULL,
@@ -101,3 +103,20 @@ CREATE TABLE `ga_casbin_rule`
     `v5`    varchar(256) DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+DROP TABLE IF EXISTS `ga_config`;
+
+CREATE table `ga_config`
+(
+    `id`         int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `module`     varchar(255)     not null default '' comment '所属模块',
+    `key`        varchar(255)     not null default '' comment '键值',
+    `value`      text comment '值',
+    `created_at` datetime                  DEFAULT NULL COMMENT '创建时间',
+    `updated_at` datetime                  DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE KEY `module_key_idx` (`module`, `key`)
+)
+    DEFAULT CHARSET = utf8mb4
+    ROW_FORMAT = DYNAMIC COMMENT ='配置表';
+
