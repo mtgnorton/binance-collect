@@ -30,10 +30,17 @@ func (p *personalService) getUploadAvatarPath() string {
 
 }
 
-func (p *personalService) Login(ctx context.Context, in define.PersonalLoginPostInput) (out *define.PersonalLoginPostOutput, err error) {
-	out = &define.PersonalLoginPostOutput{}
+func (p *personalService) LoginInfo(ctx context.Context) (out *define.PersonalLoginInfoOutput, err error) {
+	out = &define.PersonalLoginInfoOutput{}
+	out.Data, err = shared.Config.Gets(ctx, "backend", "is_open_verify_captcha")
+	return
+}
 
-	if false && !Common.VerifyCaptcha(ctx, in.Code, in.CaptchaId) {
+func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInput) (out *define.PersonalLoginOutput, err error) {
+	out = &define.PersonalLoginOutput{}
+
+	isVerifyCaptcha, err := shared.Config.Get(ctx, shared.Config.BACKEND, "is_open_verify_captcha")
+	if isVerifyCaptcha.Bool() && !Common.VerifyCaptcha(ctx, in.Code, in.CaptchaId) {
 		err = gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误")
 		return
 	}

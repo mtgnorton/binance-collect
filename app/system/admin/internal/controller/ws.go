@@ -2,11 +2,11 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"gf-admin/app/model"
 	"gf-admin/app/shared"
 	"gf-admin/app/system/admin/internal/service"
 	"gf-admin/utility"
+	"gf-admin/utility/logging"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -38,7 +38,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 			Type:    "error",
 			Message: err.Error(),
 		})
-		g.Log("ws").Errorf(r.Context(), "ws授权验证失败：%s", err)
+		logging.ErrorLog(err)
 		r.Exit()
 	}
 	wsUser.SetUserId(administrator.Id)
@@ -47,7 +47,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
-			fmt.Println(err, 5555)
+			logging.ErrorLog(err)
 			return
 		}
 		wm, err := service.TransferWsMessage(msg)
@@ -64,7 +64,6 @@ func (w *ws) Ws(r *ghttp.Request) {
 			continue
 		}
 
-		fmt.Println("接收到的用户消息为：", wm)
 		if err != nil {
 			wsUser.Write(&service.WsMessage{
 				Type:    "error",
@@ -88,7 +87,6 @@ func (w *ws) auth(r *ghttp.Request) (administrator *model.AdministratorSummary, 
 
 	err = service.AdminTokenInstance.LoadConfig().InitUser(r)
 
-	fmt.Println(err, 66666)
 	if err != nil {
 		return administrator, err
 	}

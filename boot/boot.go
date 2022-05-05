@@ -11,7 +11,13 @@ import (
 	"github.com/gogf/gf/v2/os/gcmd"
 )
 
-var EnvName = "prod"
+var EnvName = ENV_PROD
+
+const (
+	ENV_DEV   = "dev"
+	ENV_PROD  = "prod"
+	ENV_LOCAL = "local"
+)
 
 func init() {
 
@@ -23,22 +29,20 @@ func init() {
 // 根据环境变量或命令行参数家在对应的配置文件，命令行参数优先级高于环境变量,默认使用prod环境
 func loadConfigFile(ctx context.Context) {
 	// 获取环境变量
-	EnvName = gcmd.GetOptWithEnv("gf_admin_env_file").String()
-	g.Log().Infof(ctx, "从命令或环境变量获取环境：%s", EnvName)
+	tempEnvName := gcmd.GetOptWithEnv("gf_admin_env_file").String()
 
-	if EnvName == "" {
-		EnvName = "prod"
-		g.Log().Infof(ctx, "从命令 或环境变量获取环境失败，使用默认环境：%s", EnvName)
-
+	if tempEnvName != "" {
+		EnvName = tempEnvName
 	}
 	switch EnvName {
-	case "dev":
+	case ENV_DEV:
 		g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-dev.toml")
-	case "prod":
+	case ENV_PROD:
 		g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-prod.toml")
-	case "local":
+	case ENV_LOCAL:
 		g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-local.toml")
 	}
+	g.Log().Infof(ctx, "从命令行或环境变量中读取的环境参数为：%s", tempEnvName)
 	g.Log().Infof(ctx, "当前配置环境：%s", EnvName)
 
 }

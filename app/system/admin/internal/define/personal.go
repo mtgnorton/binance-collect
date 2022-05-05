@@ -1,27 +1,39 @@
 package define
 
 import (
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 )
 
-type PersonalLoginPostReq struct {
-	g.Meta `path:"/login" method:"post" summary:"执行登录请求" tags:"a全局"`
-	PersonalLoginPostInput
-}
-type PersonalLoginPostRes struct {
-	*PersonalLoginPostOutput
+type PersonalLoginInfoReq struct {
+	g.Meta `path:"/login-info" method:"GET" summary:"相关登录信息" tags:"a全局"`
 }
 
-type PersonalLoginPostInput struct {
+type PersonalLoginInfoOutput struct {
+	Data map[string]*gvar.Var `json:"data"`
+}
+type PersonalLoginInfoRes struct {
+	*PersonalLoginInfoOutput
+}
+
+type PersonalLoginReq struct {
+	g.Meta `path:"/login" method:"post" summary:"执行登录请求" tags:"a全局"`
+	PersonalLoginInput
+}
+type PersonalLoginRes struct {
+	*PersonalLoginOutput
+}
+
+type PersonalLoginInput struct {
 	Username  string `json:"username" v:"required#请输入账号"   dc:"账号" d:"admin"`
 	Password  string `json:"password" v:"required#请输入密码"   dc:"密码(明文)" d:"admin"`
-	Code      string `json:"code"  v:"required#请输入验证码" dc:"验证码"`
-	CaptchaId string `json:"captcha_id" v:"required#captcha_id必须" dc:"后端返回的captcha标识符"`
+	Code      string `json:"code"  v:"" dc:"验证码"`
+	CaptchaId string `json:"captcha_id" v:"" dc:"后端返回的captcha标识符"`
 }
 
-type PersonalLoginPostOutput struct {
+type PersonalLoginOutput struct {
 	Token string
 }
 

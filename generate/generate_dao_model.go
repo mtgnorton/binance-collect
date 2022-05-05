@@ -9,13 +9,15 @@ import (
 )
 
 func main() {
-	table := "ga_config"
+
+	table := "" //ga_admin_log
 	ctx := gctx.New()
 
 	command := "gf gen dao"
 	if table != "" {
 		command = `gf gen dao -t ` + table
 	}
+
 	cmd := exec.Command("/bin/zsh", "-c", command)
 	var output []byte
 	var err error

@@ -162,7 +162,6 @@ func (ws *wsService) RemoveUser(userId uint, indexOption ...int) bool {
 		users = append(users[:index], users[index+1:]...)
 		ws.wsUsersMap[userId] = users
 
-	} else {
 		fmt.Println("ssssssfsdfs")
 		for _, user := range users { //移除整个slice
 			user.Clear()
@@ -204,7 +203,7 @@ func (user *wsUser) WriteLoop() {
 		}
 		err := user.Conn.WriteJSON(msg)
 		if err != nil {
-			g.Log("ws").Error(gctx.New(), err)
+			g.Log("ws").Debugf(gctx.New(), "用户id%v连接已关闭", user.Id)
 			user.close = true //等待定时任务进行清理
 			return
 		}

@@ -74,6 +74,7 @@ CREATE TABLE `ga_admin_menu`
   ROW_FORMAT = DYNAMIC COMMENT ='后台菜单表';
 
 
+
 DROP TABLE IF EXISTS `ga_role_menu`;
 
 CREATE TABLE `ga_role_menu`
@@ -120,3 +121,17 @@ CREATE table `ga_config`
     DEFAULT CHARSET = utf8mb4
     ROW_FORMAT = DYNAMIC COMMENT ='配置表';
 
+drop table if exists `ga_admin_log`;
+create table `ga_admin_log`
+(
+    `id`               int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `administrator_id` int(11) unsigned NOT NULL COMMENT '管理员id',
+    `path`             varchar(255)     not null default '' comment '请求路径',
+    `method`           varchar(10)      not null default '' comment '请求方法',
+    `path_name`        varchar(255)     not null default '' comment '请求路径名称',
+    `params`           text                      default null comment '请求参数',
+    `response`         longtext                  default null comment '响应结果',
+    `created_at`       datetime                  DEFAULT NULL COMMENT '创建时间',
+    `updated_at`       datetime                  DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+)

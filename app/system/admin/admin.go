@@ -61,6 +61,7 @@ func Run(ctx context.Context) {
 		group.Group("/", func(group *ghttp.RouterGroup) {
 			group.Middleware(
 				shared.Middleware.Ctx,
+				service.Middleware.OperationLog,
 				service.Middleware.ResponseHandler,
 			)
 			//无需登录验证的路由
@@ -80,6 +81,7 @@ func Run(ctx context.Context) {
 				// 需要权限验证的路由
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Middleware(service.Middleware.Permission)
+					group.Middleware(service.Middleware.OperationLog)
 
 					group.Bind(
 						controller.Administrator,
@@ -99,9 +101,9 @@ func Run(ctx context.Context) {
 
 	s.BindHookHandlerByMap("/*", map[string]ghttp.HandlerFunc{
 		ghttp.HookBeforeServe: func(r *ghttp.Request) {
-			g.Log().Debug(ctx, ghttp.HookBeforeServe)
-			r.SetParam("key1", "v11")
-			r.GetRequest("key1")
+			//g.Log().Debug(ctx, ghttp.HookBeforeServe)
+			//r.SetParam("key1", "v11")
+			//r.GetRequest("key1")
 		},
 	})
 

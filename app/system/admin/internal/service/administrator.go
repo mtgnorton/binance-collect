@@ -74,7 +74,7 @@ func (a *administratorService) List(ctx context.Context, in *define.Administrato
 	out.Size = in.Size
 	out.Total, err = d.Count()
 	if err != nil {
-		return out, gerror.Wrap(err, "查询总数错误")
+		return out, gerror.New(err.Error())
 	}
 	d = d.Page(in.Page, in.Size)
 	if in.OrderField != "" && in.OrderDirection != "" {

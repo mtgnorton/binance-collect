@@ -2,14 +2,48 @@
 
 # description:
 
-1. 配置使用的config文件,可选值有(local,dev,prod),默认为prod,可以通过命令行参数(gf.admin.env.file)和环境变量(GF_ADMIN_ENV_FILE)设置，当同时设置时，优先使用命令行参数
-    - 使用命令行参数，`go run main.go --gf.admin.env.file=local` 
+1. 配置文件： 可选值有(local,dev,prod),默认为prod,可以通过命令行参数(gf.admin.env.file)和环境变量(GF_ADMIN_ENV_FILE)设置，当同时设置时，优先使用命令行参数
+    - 使用命令行参数，`go run main.go --gf.admin.env.file=local`
     - 使用环境变量，`export GF_ADMIN_ENV_FILE=local; go run main.go`,gf命令类似`export GF_ADMIN_ENV_FILE=local; gf run main.go`
+2. 路由命名规范：如下
+    ```
+   增删该查相关，以角色举例
+    角色列表： RoleListReq,RoleListRes-> role-list
+    角色添加: RoleStoreReq,RleStoreRes-> role-store
+    角色详情：RoleInfoReq,RoleInfoRes ->role-info
+    角色更新：RoleUpdateReq,RoleUpdateRes -> role-update
+    角色删除：RoleDestroyReq,RoleDestroyRes-> role-destroy
+   
+   get/post相关，以登录举例
+   登录get: LoginInfoReq,LoginInfoRes -> login-info
+   登录post: LoginReq,LoginRes -> login
+    ```
+3. 错误处理
+   错误会在调用栈中依次返回，最原始的错误需要被gerror.New封装后再返回，api层需要使用gerror.Wrap封装返回给用户的错误消息,错误的堆栈会被记录到默认日志中,使用举例如下：
+    ```
+    func c3() error {
+	err1 := errors.New("sql error")
+    return gerror.New(err1.Error()) //使用gerror.New封装,为了打印出最原始的错误堆栈
+    }
+   
+    func c2() error {
+    return c3()
+   }
+   
+   func c1() error(){
+    err := c2()
+   if err!=nil{
+    gerror.Wrap(err,"数据库错误")//错误信息展示给用户
+   }
+   }
+    ```
 
 # todo
 
 1. swagger 分组问题
 2. model 数据模型问题
+3. 操作日志
+4. 登录日志
 
 # 注意事项
 

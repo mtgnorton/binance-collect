@@ -3,14 +3,18 @@ package shared
 import (
 	"context"
 	"gf-admin/app/dao"
-	"github.com/gogf/gf/container/gvar"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 )
 
-var Config = config{}
+var Config = config{
+	BACKEND: "backend",
+}
 
 type config struct {
+	BACKEND string
 }
 
 //根据传递的module和key获取对应的配置值
@@ -26,7 +30,7 @@ func (c *config) Get(ctx context.Context, module, key string) (value *gvar.Var, 
 	}
 	record, err := dao.Config.Ctx(ctx).Where(condition).One()
 	if err != nil {
-		return gvar.New(record[dao.Config.Columns.Value]), err
+		return gvar.New(record[dao.Config.Columns.Value]), gerror.New(err.Error())
 	}
 	return gvar.New(record[dao.Config.Columns.Value]), nil
 
@@ -55,7 +59,7 @@ func (c *config) Gets(ctx context.Context, module string, keys ...string) (value
 		values[record[dao.Config.Columns.Key].String()] = gvar.New(record[dao.Config.Columns.Value])
 	}
 
-	return values, err
+	return values, nil
 
 }
 
@@ -86,7 +90,7 @@ func (c *config) Sets(ctx context.Context, module string, mapping map[string]int
 			}
 			_, err = tx.Ctx(ctx).Save(dao.Config.Table, data)
 			if err != nil {
-				return err
+				return gerror.New(err.Error())
 			}
 		}
 		return nil

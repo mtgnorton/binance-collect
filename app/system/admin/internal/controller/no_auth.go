@@ -11,10 +11,17 @@ var NoAuth = noAuth{}
 type noAuth struct {
 }
 
-func (l *noAuth) Login(ctx context.Context, req *define.PersonalLoginPostReq) (res *define.PersonalLoginPostRes, err error) {
-	res = &define.PersonalLoginPostRes{}
+func (l *noAuth) LoginInfo(ctx context.Context, req *define.PersonalLoginInfoReq) (res *define.PersonalLoginInfoRes, err error) {
 
-	res.PersonalLoginPostOutput, err = service.Personal.Login(ctx, req.PersonalLoginPostInput)
+	res = &define.PersonalLoginInfoRes{}
+	res.PersonalLoginInfoOutput, err = service.Personal.LoginInfo(ctx)
+	return
+}
+
+func (l *noAuth) Login(ctx context.Context, req *define.PersonalLoginReq) (res *define.PersonalLoginRes, err error) {
+	res = &define.PersonalLoginRes{}
+
+	res.PersonalLoginOutput, err = service.Personal.Login(ctx, req.PersonalLoginInput)
 	return
 }
 

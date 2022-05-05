@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"gf-admin/utility/response"
+	"github.com/gogf/gf/encoding/gbase64"
 	"github.com/gogf/gf/v2/crypto/gaes"
 	"github.com/gogf/gf/v2/crypto/gmd5"
-	"github.com/gogf/gf/v2/encoding/gurl"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -75,7 +75,7 @@ func (t *TokenHandler) Middleware(group *ghttp.RouterGroup) {
 
 		err := t.InitUser(r)
 		if err != nil {
-			response.JsonExit(r, gcode.CodeNotAuthorized.Code(), err.Error())
+			response.JsonErrorLogExit(r, gerror.Wrap(err, "用户验证失败"), gcode.CodeNotAuthorized)
 		}
 		r.Middleware.Next()
 	})
@@ -176,7 +176,7 @@ func (t *TokenHandler) Validate(ctx context.Context, token string) (tf TokenFram
 	}
 
 	if tf1.GetUUID() != tf2.GetUUID() {
-		return tf2, gerror.New("user Token auth error")
+		return tf2, gerror.New("用户token错误")
 	}
 	return tf2, nil
 
@@ -196,13 +196,13 @@ func (t *TokenHandler) GetTokenFromRequest(ctx context.Context, r *ghttp.Request
 		parts := strings.SplitN(authHeader, " ", 2)
 		g.Log("token").Debugf(ctx, "通过header头获取到的token为:%s", authHeader)
 		if len(parts) != 2 || gstr.Trim(parts[0]) != "Bearer" || gstr.Trim(parts[1]) == "" {
-			return "", gerror.New("get Token from request error")
+			return "", gerror.New("token格式错误")
 		}
 		token = gstr.Trim(parts[1])
 		return token, nil
 	}
 
-	return "", gerror.New("please login ")
+	return "", gerror.New("token错误")
 
 }
 
@@ -228,7 +228,6 @@ func (t *TokenHandler) GetData(ctx context.Context, userKey string) (tf TokenFra
 	if gconv.Int64(refreshTime) == 0 || nowTime > gconv.Int64(refreshTime) {
 		tf.CreateTime = nowTime
 		tf.RefreshTime = nowTime + gconv.Int64(t.MaxRefresh)
-		g.Log("Token").Debug(ctx, "Token refresh", tf)
 		err = t.cacheSet(ctx, cacheKey, tf)
 		if err != nil {
 			return tf, err
@@ -246,7 +245,6 @@ func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...stri
 	if len(uuid) == 0 || uuid[0] == "" {
 		tf.UUID, err = gmd5.Encrypt(grand.Letters(10))
 		if err != nil {
-			g.Log("Token").Errorf(ctx, "UUID generate error,error following %s", err)
 			return tf, err
 		}
 	}
@@ -255,8 +253,10 @@ func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...stri
 	if err != nil {
 		return tf, gerror.Wrap(err, "gaes encrypt Token error")
 	}
-	tf.Token = string(gurl.Encode(string(token)))
-
+	tf.Token = string(gbase64.Encode(token))
+	//为了使token可以作为url参数需要对+/进行替换，替换为-_
+	tf.Token = strings.Replace(tf.Token, "+", "-", -1)
+	tf.Token = strings.Replace(tf.Token, "/", "_", -1)
 	return tf, nil
 }
 
@@ -268,13 +268,16 @@ func (t *TokenHandler) decrypt(ctx context.Context, token string) (tf TokenFrame
 	if tf.GetToken() == "" {
 		return tf, gerror.New("decrypt Token empty")
 	}
-	tokenBase64, err := gurl.Decode(token)
+	token = strings.Replace(token, "-", "+", -1)
+	token = strings.Replace(token, "_", "/", -1)
+	tokenBase64, err := gbase64.Decode([]byte(token))
+
 	if err != nil {
-		return tf, err
+		return tf, gerror.New(err.Error())
 	}
 	tokenDecrypted, err := gaes.Decrypt([]byte(tokenBase64), t.EncryptKey)
 	if err != nil {
-		return tf, err
+		return tf, gerror.New(err.Error())
 	}
 	tokenComponents := gstr.Split(string(tokenDecrypted), "_")
 	if len(tokenComponents) < 2 {
@@ -293,7 +296,7 @@ func (t *TokenHandler) cacheGet(ctx context.Context, key string) (tf TokenFrame,
 	case CacheModeRedis:
 		valueVar, err = g.Redis().Do(ctx, "get", key)
 		if err != nil {
-			return tf, gerror.Wrap(err, "token get redis cache error")
+			return tf, gerror.New(err.Error())
 		}
 		if valueVar.IsNil() || valueVar.IsEmpty() {
 			return tf, gerror.New("用户未登录")
@@ -302,13 +305,13 @@ func (t *TokenHandler) cacheGet(ctx context.Context, key string) (tf TokenFrame,
 	default:
 		valueVar, err = gcache.Get(ctx, key)
 		if err != nil {
-			return tf, gerror.Wrap(err, "Token get gcache cache error")
+			return tf, gerror.New(err.Error())
 		}
 
 	}
 	err = valueVar.Scan(&tf)
 	if err != nil {
-		return tf, gerror.Wrap(err, "Token redis cache scan error")
+		return tf, gerror.New(err.Error())
 	}
 	return tf, err
 
@@ -337,7 +340,7 @@ func (t *TokenHandler) cacheRemove(ctx context.Context, key string) (err error) 
 	case CacheModeRedis:
 		_, err = g.Redis().Do(ctx, "del", key)
 		if err != nil {
-			return gerror.Wrap(err, "redis del error")
+			return gerror.New(err.Error())
 		}
 	default:
 		_, err = gcache.Remove(ctx, err)
