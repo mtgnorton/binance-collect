@@ -63,7 +63,7 @@ func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInpu
 		return
 	}
 
-	token, err := AdminTokenInstance.GenerateAndSaveData(ctx, in.Username, adminSummary)
+	token, err := AdminTokenInstance.LoadConfig().GenerateAndSaveData(ctx, in.Username, adminSummary)
 
 	out.Token = token
 	shared.Context.SetUser(ctx, adminSummary)

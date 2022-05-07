@@ -57,10 +57,10 @@ func (a *administratorService) List(ctx context.Context, in *define.Administrato
 	d := dao.Administrator.Ctx(ctx)
 
 	if in.Username != "" {
-		d = d.WhereLike("username", fmt.Sprintf("%%%s%%", in.Username))
+		d = d.WhereLike(dao.Administrator.Columns.Username, fmt.Sprintf("%%%s%%", in.Username))
 	}
 	if in.Status != "" {
-		d = d.WhereIn("status", g.Slice{in.Status})
+		d = d.WhereIn(dao.Administrator.Columns.Status, g.Slice{in.Status})
 	}
 	if in.BeginTime != "" {
 		d = d.WhereGTE(dao.Administrator.Columns.CreatedAt, in.BeginTime)

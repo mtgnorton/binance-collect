@@ -14,6 +14,7 @@ var AdminTokenInstance = adminTokenHandle{ //如果直接在这里获取配置�
 type adminTokenHandle struct {
 	shared.TokenHandler
 	administrator *model.AdministratorSummary
+	loadConfig    bool
 }
 
 //加载配置文件里面token的相关配置,应该最先调用该方法
@@ -23,15 +24,22 @@ func (a *adminTokenHandle) LoadConfig() *adminTokenHandle {
 		CacheMode:  shared.CacheModeRedis,
 		Timeout:    g.Cfg().MustGet(ctx, "token.Timeout").Int(),
 		MaxRefresh: g.Cfg().MustGet(ctx, "token.MaxRefresh").Int(),
+		CacheKey:   g.Cfg().MustGet(ctx, "token.CacheKey").String(),
 		EncryptKey: g.Cfg().MustGet(ctx, "token.EncryptKey").Bytes(),
 		MultiLogin: g.Cfg().MustGet(ctx, "token.MultiLogin").Bool(),
 	}
+	g.Dump("token instance", AdminTokenInstance.TokenHandler)
+	a.loadConfig = true
 	return a
 }
 
 func (a *adminTokenHandle) GetAdministrator(ctx context.Context) (administrator *model.AdministratorSummary, err error) {
 
-	if a.administrator != nil {
+	if !a.loadConfig {
+		a.LoadConfig()
+	}
+
+	if a.administrator != nil && a.administrator.Id != 0 {
 		return a.administrator, nil
 	}
 	data := shared.Context.GetUser(ctx)

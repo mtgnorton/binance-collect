@@ -176,6 +176,7 @@ func (t *TokenHandler) Validate(ctx context.Context, token string) (tf TokenFram
 	}
 
 	if tf1.GetUUID() != tf2.GetUUID() {
+		g.Dump("tf1,tf2", token, tf1, tf2)
 		return tf2, gerror.New("用户token错误")
 	}
 	return tf2, nil
@@ -219,6 +220,8 @@ func (t *TokenHandler) Remove(ctx context.Context, token string) (err error) {
 /*根据userKey 获取data*/
 func (t *TokenHandler) GetData(ctx context.Context, userKey string) (tf TokenFrame, err error) {
 	cacheKey := t.CacheKey + userKey
+
+	g.Dump("cache key", cacheKey)
 	tf, err = t.cacheGet(ctx, cacheKey)
 	if err != nil {
 		return tf, err
@@ -299,6 +302,7 @@ func (t *TokenHandler) cacheGet(ctx context.Context, key string) (tf TokenFrame,
 			return tf, gerror.New(err.Error())
 		}
 		if valueVar.IsNil() || valueVar.IsEmpty() {
+			g.Dump("redis", key)
 			return tf, gerror.New("用户未登录")
 		}
 
@@ -320,6 +324,7 @@ func (t *TokenHandler) cacheSet(ctx context.Context, key string, value TokenFram
 	switch t.CacheMode {
 	case CacheModeRedis:
 
+		g.Dump("cacheset", key, value)
 		if t.Timeout == 0 {
 			_, err = g.Redis().Do(ctx, "set", key, value)
 		} else {

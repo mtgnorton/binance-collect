@@ -33,7 +33,7 @@ func (r *role) List(ctx context.Context, in *define.RoleListInput) (out *define.
 	if in.Status != "" {
 		d = d.Where(dao.Role.Columns.Status, in.Status)
 	}
-	out.Total, err = d.Clone().Count()
+	out.Total, err = d.Count()
 
 	if err != nil {
 		return out, err
@@ -83,7 +83,6 @@ func (r *role) Info(ctx context.Context, in *define.RoleInfoInput) (out *define.
 		return
 	}
 	menuIds, err := dao.RoleMenu.Ctx(ctx).Where(dao.RoleMenu.Columns.RoleId, in.Id).Array(dao.RoleMenu.Columns.MenuId)
-	g.Dump(menuIds, 4444)
 	out.Role.MenuIds = make([]uint, 0)
 	for _, menuId := range menuIds {
 		out.Role.MenuIds = append(out.Role.MenuIds, menuId.Uint())

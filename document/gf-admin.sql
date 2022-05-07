@@ -134,4 +134,19 @@ create table `ga_admin_log`
     `created_at`       datetime                  DEFAULT NULL COMMENT '创建时间',
     `updated_at`       datetime                  DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
+);
+
+
+drop table if exists `ga_login_log`;
+create table `ga_login_log`
+(
+    `id`               int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `administrator_id` int(11) unsigned NOT NULL COMMENT '管理员id',
+    `ip`             varchar(30)     not null default '' comment 'ip地址',
+    `browser`           varchar(10)      not null default '' comment '浏览器',
+    `os`        varchar(255)     not null default '' comment '操作系统',
+    `status`         varchar(10)               DEFAULT 'normal' COMMENT '状态 success 成功 fail 失败',
+    `created_at`       datetime                  DEFAULT NULL COMMENT '创建时间',
+    `updated_at`       datetime                  DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
 )

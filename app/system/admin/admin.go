@@ -81,13 +81,13 @@ func Run(ctx context.Context) {
 				// 需要权限验证的路由
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Middleware(service.Middleware.Permission)
-					group.Middleware(service.Middleware.OperationLog)
 
 					group.Bind(
 						controller.Administrator,
 						controller.Role,
 						controller.Menu,
 						controller.Config,
+						controller.OperationLog,
 					)
 				})
 			})

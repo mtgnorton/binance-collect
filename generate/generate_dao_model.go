@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	table := "" //ga_admin_log
+	table := "ga_login_log" //ga_admin_log
 	ctx := gctx.New()
 
 	command := "gf gen dao"
@@ -34,7 +34,6 @@ func main() {
 		"/app/service/internal/dao/internal": "/app/dao/internal/",
 		"/app/service/internal/dto":          "/app/dto/",
 	}
-
 	for tempSource, tempDst := range Dirs {
 		gfile.ScanDirFileFunc(rootPath+tempSource, "", false, func(path string) string {
 			dst := rootPath + tempDst + gfile.Basename(path)

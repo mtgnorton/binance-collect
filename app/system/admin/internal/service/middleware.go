@@ -36,9 +36,14 @@ func (s *serviceMiddleware) GetIgnoreAuthUrls() []string {
 func (s *serviceMiddleware) OperationLog(r *ghttp.Request) {
 
 	r.Middleware.Next()
+
+	if r.Method == "GET" {
+		return
+	}
+
 	path := r.URL.Path
 	pathName, err := dao.AdminMenu.Ctx(r.Context()).Where(g.Map{
-		dao.AdminMenu.Columns.Path: path,
+		dao.AdminMenu.Columns.Identification: strings.Replace(path, g.Cfg().MustGet(r.Context(), "server.prefix").String(), "", -1),
 	}).Value(dao.AdminMenu.Columns.Name)
 	if err != nil {
 		response.JsonErrorLogExit(r, err)
@@ -135,7 +140,7 @@ func (s *serviceMiddleware) Auth(r *ghttp.Request) {
 	}
 
 	if administrator.Id == 0 {
-
+		g.Dump("admin", administrator)
 		response.JsonErrorLogExit(r, gerror.New("未登录或会话已过期，请您登录后再继续"), gcode.CodeNotAuthorized)
 
 	}
@@ -159,7 +164,7 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 	}
 
 	path := gstr.Replace(url, prefix.String(), "")
-	g.Log("auth").Debugf(r.Context(), "权限认证,用户为:%s,path为:%s,method为:%s", administrator.Username, path, method)
+	g.Log("auth").Infof(r.Context(), "权限认证,用户为:%s,path为:%s,method为:%s", administrator.Username, path, method)
 
 	if garray.NewStrArrayFrom(s.GetIgnoreAuthUrls(), true).ContainsI(path) {
 		r.Middleware.Next()
@@ -168,7 +173,7 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 
 	isAllow, err := Enforcer.Auth(administrator.Username, path, method)
 	if err != nil || !isAllow {
-		response.JsonErrorLogExit(r, gerror.Wrap(err, "没有权限"), gcode.CodeNotAuthorized)
+		response.JsonErrorLogExit(r, gerror.New("没有权限"), gcode.CodeNotAuthorized)
 	}
 	r.Middleware.Next()
 }
