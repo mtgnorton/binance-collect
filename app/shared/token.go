@@ -3,6 +3,7 @@ package shared
 import (
 	"context"
 	"fmt"
+	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
 	"github.com/gogf/gf/encoding/gbase64"
 	"github.com/gogf/gf/v2/crypto/gaes"
@@ -75,7 +76,7 @@ func (t *TokenHandler) Middleware(group *ghttp.RouterGroup) {
 
 		err := t.InitUser(r)
 		if err != nil {
-			response.JsonErrorLogExit(r, gerror.Wrap(err, "用户验证失败"), gcode.CodeNotAuthorized)
+			response.JsonErrorLogExit(r, err)
 		}
 		r.Middleware.Next()
 	})
@@ -188,7 +189,6 @@ func (t *TokenHandler) GetTokenFromRequest(ctx context.Context, r *ghttp.Request
 	token = r.GetQuery("token").String()
 
 	if token != "" {
-		//g.Log("token").Debugf(ctx, "通过url参数获取到的token为:%s", token)
 		return
 	}
 
@@ -197,13 +197,13 @@ func (t *TokenHandler) GetTokenFromRequest(ctx context.Context, r *ghttp.Request
 		parts := strings.SplitN(authHeader, " ", 2)
 		g.Log("token").Debugf(ctx, "通过header头获取到的token为:%s", authHeader)
 		if len(parts) != 2 || gstr.Trim(parts[0]) != "Bearer" || gstr.Trim(parts[1]) == "" {
-			return "", gerror.New("token格式错误")
+			return "", custom_error.New("token格式错误", map[string]interface{}{"token": token})
 		}
 		token = gstr.Trim(parts[1])
 		return token, nil
 	}
 
-	return "", gerror.New("token错误")
+	return "", custom_error.New("token不存在")
 
 }
 
@@ -265,26 +265,28 @@ func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...stri
 
 /*将token解密为userKey和uuid*/
 func (t *TokenHandler) decrypt(ctx context.Context, token string) (tf TokenFrame, err error) {
+
 	tf = TokenFrame{
 		Token: token,
 	}
-	if tf.GetToken() == "" {
-		return tf, gerror.New("decrypt Token empty")
+	if token == "" {
+		return tf, custom_error.New("token不存在")
 	}
 	token = strings.Replace(token, "-", "+", -1)
 	token = strings.Replace(token, "_", "/", -1)
+	token = ""
 	tokenBase64, err := gbase64.Decode([]byte(token))
 
 	if err != nil {
-		return tf, gerror.New(err.Error())
+		return tf, custom_error.Wrap(err, "token错误", map[string]interface{}{"token": token})
 	}
 	tokenDecrypted, err := gaes.Decrypt([]byte(tokenBase64), t.EncryptKey)
 	if err != nil {
-		return tf, gerror.New(err.Error())
+		return tf, custom_error.Wrap(err, "token错误", map[string]interface{}{"token": token})
 	}
 	tokenComponents := gstr.Split(string(tokenDecrypted), "_")
 	if len(tokenComponents) < 2 {
-		return tf, gerror.New("decrypt token length error")
+		return tf, custom_error.Wrap(err, "token错误", map[string]interface{}{"token": token})
 	}
 	tf.UserKey = tokenComponents[0]
 	tf.UUID = tokenComponents[1]
@@ -299,23 +301,23 @@ func (t *TokenHandler) cacheGet(ctx context.Context, key string) (tf TokenFrame,
 	case CacheModeRedis:
 		valueVar, err = g.Redis().Do(ctx, "get", key)
 		if err != nil {
-			return tf, gerror.New(err.Error())
+			return tf, custom_error.Wrap(err, "")
 		}
 		if valueVar.IsNil() || valueVar.IsEmpty() {
 			g.Dump("redis", key)
-			return tf, gerror.New("用户未登录")
+			return tf, custom_error.New("用户尚未登录")
 		}
 
 	default:
 		valueVar, err = gcache.Get(ctx, key)
 		if err != nil {
-			return tf, gerror.New(err.Error())
+			return tf, custom_error.Wrap(err, "")
 		}
 
 	}
 	err = valueVar.Scan(&tf)
 	if err != nil {
-		return tf, gerror.New(err.Error())
+		return tf, custom_error.Wrap(err, "", map[string]interface{}{"valueVar": valueVar.Map()})
 	}
 	return tf, err
 
@@ -331,7 +333,7 @@ func (t *TokenHandler) cacheSet(ctx context.Context, key string, value TokenFram
 			_, err = g.Redis().Do(ctx, "setex", key, t.Timeout/1000, value)
 		}
 		if err != nil {
-			return gerror.Wrap(err, "redis set error")
+			return custom_error.Wrap(err, "", g.Map{"key": key, "value": value})
 		}
 	default:
 		err = gcache.Set(ctx, key, value, gconv.Duration(t.Timeout)*time.Microsecond)
@@ -345,10 +347,10 @@ func (t *TokenHandler) cacheRemove(ctx context.Context, key string) (err error) 
 	case CacheModeRedis:
 		_, err = g.Redis().Do(ctx, "del", key)
 		if err != nil {
-			return gerror.New(err.Error())
+			return custom_error.Wrap(err, "", g.Map{"key": key})
 		}
 	default:
 		_, err = gcache.Remove(ctx, err)
 	}
-	return err
+	return custom_error.Wrap(err, "", g.Map{"key": key})
 }

@@ -5,10 +5,10 @@ import (
 	"context"
 	"gf-admin/app/dao"
 	"gf-admin/app/dto"
+	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/errors/gcode"
-	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
@@ -78,14 +78,13 @@ func (s *serviceMiddleware) OperationLog(r *ghttp.Request) {
 // 返回处理中间件
 func (s *serviceMiddleware) ResponseHandler(r *ghttp.Request) {
 
-	g.Log().Infof(r.Context(), "请求的url为：%s,客户端端传递过来的参数如下", r.URL.Path)
-
 	buffers := bytes.NewBuffer([]byte(""))
 	g.DumpTo(buffers, r.GetMap(), gutil.DumpOption{})
+
+	g.Log().Infof(r.Context(), "请求的url为：%s,客户端端传递过来的参数如下", r.URL.Path)
 	g.Log().Infof(r.Context(), "%s", buffers)
 
 	r.Middleware.Next()
-	g.Log().Debug(r.Context(), "响应中间件开始执行")
 
 	//系统运行时错误
 	if err := r.GetError(); err != nil {
@@ -136,12 +135,11 @@ func (s *serviceMiddleware) Auth(r *ghttp.Request) {
 	g.Log("auth").Debug(r.Context(), "是否登录验证中间件开始执行")
 	administrator, err := AdminTokenInstance.GetAdministrator(r.Context())
 	if err != nil {
-		response.JsonErrorLogExit(r, err, gcode.CodeNotAuthorized)
+		response.JsonErrorLogExit(r, err)
 	}
 
 	if administrator.Id == 0 {
-		g.Dump("admin", administrator)
-		response.JsonErrorLogExit(r, gerror.New("未登录或会话已过期，请您登录后再继续"), gcode.CodeNotAuthorized)
+		response.JsonErrorLogExit(r, custom_error.New("未登录或会话已过期，请您登录后再继续", g.Map{"administrator": administrator}))
 
 	}
 
@@ -152,7 +150,7 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 
 	administrator, err := AdminTokenInstance.GetAdministrator(r.Context())
 	if err != nil {
-		response.JsonErrorLogExit(r, gerror.Wrap(err, "没有权限"), gcode.CodeNotAuthorized)
+		response.JsonErrorLogExit(r, custom_error.Wrap(err, "没有权限", g.Map{"administrator": administrator}))
 
 	}
 
@@ -173,7 +171,7 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 
 	isAllow, err := Enforcer.Auth(administrator.Username, path, method)
 	if err != nil || !isAllow {
-		response.JsonErrorLogExit(r, gerror.New("没有权限"), gcode.CodeNotAuthorized)
+		response.JsonErrorLogExit(r, custom_error.Wrap(err, "没有权限", g.Map{"administrator": administrator}))
 	}
 	r.Middleware.Next()
 }

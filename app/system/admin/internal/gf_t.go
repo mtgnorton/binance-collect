@@ -2,15 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"os"
-	"reflect"
-
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gstructs"
+	"reflect"
 )
 
 type cMain struct {
@@ -34,40 +31,97 @@ func (c *cMain) Http(ctx context.Context, in cMainHttpInput) (out *cMainHttpOutp
 	return
 }
 
-type Runnable = interface {
-	Run()
-}
-
 func main() {
 
-	cm := cMain{}
-	rt := reflect.TypeOf(cm)
-	rv := reflect.ValueOf(cm)
-	g.DumpWithType(rt.Kind())
-	g.DumpWithType(rv.Kind())
+	m := cMain{}
+	reflectValue := reflect.ValueOf(m)
 
-	cmp := &cMain{}
-	rtp := reflect.TypeOf(cmp)
-	rvp := reflect.ValueOf(cmp)
-	g.DumpWithType(rtp.Kind(), rtp.Elem())
-	g.DumpWithType(rvp.Kind(), rvp.Elem(), rvp.Elem().Kind())
+	//如果是struct，则无法获取到指针方法,需要构建一个该struct对应的指针Value
+	if reflectValue.Kind() == reflect.Struct {
+		//reflect.New 返回一个reflect.Value,该Value是一个指向某个类型的新的零值的指针
+		newValue := reflect.New(reflectValue.Type())
+		newValue.Elem().Set(reflectValue)
+		reflectValue = newValue
+	}
 
-	fmt.Println("======")
-	s := make([]string, 0)
-	rtp = reflect.TypeOf(s)
-	rvp = reflect.ValueOf(s)
-	g.DumpWithType(rtp.Kind(), rtp.Elem())
+	//reflectValue.Method返回reflect.Value
+	method := reflectValue.Method(0)
+	methodType := method.Type()
 
-	fmt.Println("====")
-	var i io.Writer
-	i = os.Stdout
-	rtp = reflect.TypeOf(i)
-	rvp = reflect.ValueOf(i)
-	g.DumpWithType(rtp.Kind(), rtp.Elem())
-	g.DumpWithType(rvp.Kind(), rvp.Elem(), rvp.Elem().Kind())
+	//*reflect.rtype(19) "main.cMainHttpInput"
+	inArgType := methodType.In(1)
 
-	//g.DumpWithType(rvp.Kind(), rvp.Elem(), rvp.Elem().Kind())
-	os.Exit(1)
+	//reflect.Kind(6) "struct"
+	inArgKind := inArgType.Kind()
+
+	var inputObject reflect.Value
+
+	if inArgKind == reflect.Ptr {
+		inputObject = reflect.New(inArgType.Elem()).Elem()
+	} else {
+
+		//Elem()返回接口或指针指向的值,类型为reflect.Value，如果调用者不是接口或指针，则会panic
+		//reflect.Value(2) {
+		//    Name: string(0) "",
+		//    Port: int(0),
+		//}
+		inputObject = reflect.New(inArgType).Elem()
+	}
+
+	//Addr()返回指向底层值的指针，为reflect.Value类型
+
+	g.DumpWithType(111, inputObject.Addr().Interface())
+	//Interface()返回调用者的底层值，类型为interface{}
+	inputObjectInterface := inputObject.Interface()
+
+	//gstructs.Fields()返回Pointer指向的struct的所有字段
+	//[]gstructs.Field(2) [
+	//    gstructs.Field(3) {
+	//        Value:    reflect.Value(0) {},
+	//        Field:    reflect.StructField(7) {
+	//            Name:      string(4) "Name",
+	//            PkgPath:   string(0) "",
+	//            Type:      *reflect.rtype(6) "string",
+	//            Tag:       reflect.StructTag(55) "v:\"required\" name:\"NAME\" arg:\"true\" brief:\"server name\"",
+	//            Offset:    uintptr(0),
+	//            Index:     []int(1) [
+	//                int(1),
+	//            ],
+	//            Anonymous: bool(false),
+	//        },
+	//        TagValue: string(0) "",
+	//    },
+	//    gstructs.Field(3) {
+	//        Value:    reflect.Value(11) "<int Value>",
+	//        Field:    reflect.StructField(7) {
+	//            Name:      string(4) "Port",
+	//            PkgPath:   string(0) "",
+	//            Type:      *reflect.rtype(3) "int",
+	//            Tag:       reflect.StructTag(63) "v:\"required\" short:\"p\" name:\"port\"  brief:\"port of http server\"",
+	//            Offset:    uintptr(16),
+	//            Index:     []int(1) [
+	//                int(2),
+	//            ],
+	//            Anonymous: bool(false),
+	//        },
+	//        TagValue: string(0) "",
+	//    },
+	//]
+	argFields, err := gstructs.Fields(gstructs.FieldsInput{
+		Pointer:         inputObjectInterface,
+		RecursiveOption: gstructs.RecursiveOptionEmbeddedNoTag,
+	})
+
+	//map[string]string(4) {
+	//    string("arg"):   string(4) "true",
+	//    string("brief"): string(11) "server name",
+	//    string("v"):     string(8) "required",
+	//    string("name"):  string(4) "NAME",
+	//}
+	argFieldTagMap := argFields[0].TagMap()
+
+	//
+	g.DumpWithType(argFieldTagMap)
 
 	cmd, err := gcmd.NewFromObject(cMain{})
 	if err != nil {

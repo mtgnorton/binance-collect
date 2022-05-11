@@ -44,7 +44,7 @@ func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInpu
 		err = gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误")
 		return
 	}
-
+	g.Dump(in, 4444444)
 	entity, err := Administrator.GetUserByPassportAndPassword(
 		ctx,
 		in.Username,

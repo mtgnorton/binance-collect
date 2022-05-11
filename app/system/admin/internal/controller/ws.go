@@ -6,7 +6,7 @@ import (
 	"gf-admin/app/shared"
 	"gf-admin/app/system/admin/internal/service"
 	"gf-admin/utility"
-	"gf-admin/utility/logging"
+	"gf-admin/utility/custom_log"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -38,7 +38,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 			Type:    "error",
 			Message: err.Error(),
 		})
-		logging.ErrorLog(err)
+		custom_log.Log(r, err)
 		r.Exit()
 	}
 	wsUser.SetUserId(administrator.Id)
@@ -47,7 +47,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
-			logging.ErrorLog(err)
+			custom_log.Log(r, err)
 			return
 		}
 		wm, err := service.TransferWsMessage(msg)

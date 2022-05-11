@@ -27,7 +27,8 @@ type PersonalLoginRes struct {
 }
 
 type PersonalLoginInput struct {
-	Username  string `json:"username" v:"required#请输入账号"   dc:"账号" d:"admin"`
+	Username string `json:"username" v:"required#请输入账号"   dc:"账号"`
+
 	Password  string `json:"password" v:"required#请输入密码"   dc:"密码(明文)" d:"admin"`
 	Code      string `json:"code"  v:"" dc:"验证码"`
 	CaptchaId string `json:"captcha_id" v:"" dc:"后端返回的captcha标识符"`

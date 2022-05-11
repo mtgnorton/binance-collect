@@ -28,7 +28,6 @@ func (a *adminTokenHandle) LoadConfig() *adminTokenHandle {
 		EncryptKey: g.Cfg().MustGet(ctx, "token.EncryptKey").Bytes(),
 		MultiLogin: g.Cfg().MustGet(ctx, "token.MultiLogin").Bool(),
 	}
-	g.Dump("token instance", AdminTokenInstance.TokenHandler)
 	a.loadConfig = true
 	return a
 }
