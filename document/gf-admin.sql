@@ -142,11 +142,33 @@ create table `ga_login_log`
 (
     `id`               int(11) unsigned NOT NULL AUTO_INCREMENT,
     `administrator_id` int(11) unsigned NOT NULL COMMENT '管理员id',
-    `ip`             varchar(30)     not null default '' comment 'ip地址',
-    `browser`           varchar(10)      not null default '' comment '浏览器',
-    `os`        varchar(255)     not null default '' comment '操作系统',
-    `status`         varchar(10)               DEFAULT 'normal' COMMENT '状态 success 成功 fail 失败',
+    `ip`               varchar(30)      not null default '' comment 'ip地址',
+    `browser`          varchar(10)      not null default '' comment '浏览器',
+    `os`               varchar(255)     not null default '' comment '操作系统',
+    `status`           varchar(10)               DEFAULT 'normal' COMMENT '状态 success 成功 fail 失败',
     `created_at`       datetime                  DEFAULT NULL COMMENT '创建时间',
     `updated_at`       datetime                  DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+);
+
+
+drop table if exists `health_record`;
+create table `health_record`
+(
+    `id`              int(11) unsigned    NOT NULL AUTO_INCREMENT,
+    `day`             datetime                     DEFAULT NULL COMMENT '当前日期',
+    `breakfast`       varchar(255)                 DEFAULT NULL COMMENT '早餐,json格式,{type:事务名称,is_later:是否晚点,has_meat:是否含肉}',
+    `launch`          varchar(255)                 DEFAULT NULL COMMENT '早餐,json格式,{type:事务名称,is_later:是否晚点,has_meat:是否含肉}',
+    `dinner`          varchar(255)                 DEFAULT NULL COMMENT '中餐,json格式,json格式,{type:事务名称,is_later:是否晚点,has_meat:是否含肉}',
+    `drink`           varchar(255)                 DEFAULT NULL COMMENT '饮料,json格式,{coffee_americano:美式咖啡,coffee_latte:拿铁,drink_mix_sang:西洋参等,drink_cold:冷饮,additional:其他附加的饮料}',
+    `sleep`           varchar(255)                 DEFAULT NULL COMMENT '睡眠,json格式,{start:开始时间,end:结束时间}',
+    `run`             varchar(255)                 DEFAULT NULL COMMENT '运动,json格式,{duration:运动时间,distance:运动距离,is_nausea:是否反胃}',
+    `stomach`         varchar(255)                 DEFAULT NULL COMMENT '胃,json格式,{stomachache_level:疼痛级别(0正常，1隐痛，2轻微疼痛，3较重疼痛，4重度疼痛),is_nausea:非运动是否恶心}',
+    `tongue`          varchar(255)                 DEFAULT NULL COMMENT '舌,json格式,{is_thick_ease:舌苔后是否缓解,is_dry:舌苔是否干燥}',
+    `defecate_amount` int(11) unsigned    not null DEFAULT 0 COMMENT '排便次数',
+    `fart_is_much`    tinyint(1) unsigned not null DEFAULT 0 COMMENT '放屁是否频繁',
+    `has_new_acne`    tinyint(1) unsigned not null DEFAULT 0 COMMENT '是否有新的痤疮',
+    `created_at`      datetime                     DEFAULT NULL COMMENT '创建时间',
+    `updated_at`      datetime                     DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
 )

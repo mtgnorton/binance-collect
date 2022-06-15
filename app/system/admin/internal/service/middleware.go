@@ -83,7 +83,6 @@ func (s *serviceMiddleware) ResponseHandler(r *ghttp.Request) {
 
 	g.Log().Infof(r.Context(), "请求的url为：%s,客户端端传递过来的参数如下", r.URL.Path)
 	g.Log().Infof(r.Context(), "%s", buffers)
-
 	r.Middleware.Next()
 
 	//系统运行时错误

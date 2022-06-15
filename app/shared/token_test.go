@@ -3,10 +3,11 @@ package shared_test
 import (
 	"fmt"
 	"gf-admin/app/shared"
+	"testing"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/test/gtest"
-	"testing"
 )
 
 var (
@@ -71,6 +72,7 @@ func TestTokenHandler_TokenValidate(t *testing.T) {
 		fmt.Printf("TestTokenHandler_TokenValidate result is %s\n", &r)
 		token2, err := tokenHandler.GenerateAndSaveData(ctx, userKey, data)
 		t.Assert(token1, token2)
+		t.AssertNil(err)
 
 	})
 }

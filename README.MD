@@ -1,56 +1,41 @@
-# gf-admin
+# 币安 出入金
 
-# description:
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-1. 配置文件： 可选值有(local,dev,prod),默认为prod,可以通过命令行参数(gf.admin.env.file)和环境变量(GF_ADMIN_ENV_FILE)设置，当同时设置时，优先使用命令行参数
-    - 使用命令行参数，`go run main.go --gf.admin.env.file=local`
-    - 使用环境变量，`export GF_ADMIN_ENV_FILE=local; go run main.go`,gf命令类似`export GF_ADMIN_ENV_FILE=local; gf run main.go`
-2. 路由命名规范：如下
-    ```
-   增删该查相关，以角色举例
-    角色列表： RoleListReq,RoleListRes-> role-list
-    角色添加: RoleStoreReq,RleStoreRes-> role-store
-    角色详情：RoleInfoReq,RoleInfoRes ->role-info
-    角色更新：RoleUpdateReq,RoleUpdateRes -> role-update
-    角色删除：RoleDestroyReq,RoleDestroyRes-> role-destroy
-   
-   get/post相关，以登录举例
-   登录get: LoginInfoReq,LoginInfoRes -> login-info
-   登录post: LoginReq,LoginRes -> login
-    ```
-3. 错误处理
-   错误会在调用栈中依次返回，最原始的错误需要被gerror.New封装后再返回，api层需要使用gerror.Wrap封装返回给用户的错误消息,错误的堆栈会被记录到默认日志中,使用举例如下：
-    ```
-    func c3() error {
-	err1 := errors.New("sql error")
-    return gerror.New(err1.Error()) //使用gerror.New封装,为了打印出最原始的错误堆栈
-    }
-   
-    func c2() error {
-    return c3()
-   }
-   
-   func c1() error(){
-    err := c2()
-   if err!=nil{
-    gerror.Wrap(err,"数据库错误")//错误信息展示给用户
-   }
-   }
-    ```
+## 内容列表
 
-# todo
+- [安装](#安装)
+- [使用说明](#使用说明)
+    - [出入金逻辑](#出入金逻辑)
+    - [eth单位换算](#eth单位换算)
+    - [测试地址](#测试地址)
+- [注意事项](#注意事项)
+- [相关仓库](#相关仓库)
 
-1. swagger 分组问题
-2. model 数据模型问题
-3. 操作日志
-4. 登录日志
+## 安装
 
-# 注意事项
+## 使用说明
 
-1.
+#### 出入金逻辑
 
-当注册路由后，出现以下类似错误`2022-04-13 22:22:57.561 [FATA] duplicated route registry "/@default" at /Users/mtgnorton/Coding/go/src/github.com/mtgnorton/gf-admin/app/system/admin/admin.go:81 , already registered at /Users/mtgnorton/Coding/go/src/github.com/mtgnorton/gf-admin/app/system/admin/admin.go:81
-`,关键词`/@default`,原因为注册的控制器中包含index方法，index方法会和gf框架默认生成的方法重复，导致报错
+#### eth单位换算
 
+如下所示，1ether等于10<sup>18</sup>wei,所以在mysql中存储以wei作为单位的数值使用varchar类型存储，存储ether的数值使用decimal类型存储。
+
+![img.png](img.png)
+
+#### 测试地址
+- 用户地址
+  - 地址：0x81023633832221b512018a21f8a3c6a6fe774913 私钥：0x841176e4948f90ea6f237d405ebd25eb0eec4b860f1e5cf76f6541c886353241
+- 第三方地址
+  - 地址：0x991195b40a5bDF4725AfbD4f10F579BCa25308F5 私钥：81bef96cefdc28f6e77256dff93a6c56f9953796a251ae796aa27ec196b26c03
+- 平台地址
+地址：0x8520e2ea780e400ab87322d04c158267f36f733a
+私钥：0x71fd0f4671de2bccccd803be24256591ef5c7bc524f3784db720c100e760f4cb
+
+- 手续费地址
+地址：0x92b1e4c92c506a95fc6b1af465eab8dab8f39ab7
+私钥：0xb9d36a8552bdb5e2cf78b9908a9569911539417d743d34d73e7d52be3ae49b61
+## 相关仓库
 
 

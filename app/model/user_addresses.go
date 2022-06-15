@@ -1,0 +1,6 @@
+package model
+
+const (
+	USER_ADDRESS_TYPE_GENERATE = 0
+	USER_ADDRESS_TYPE_IMPORT   = 1
+)

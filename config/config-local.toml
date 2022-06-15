@@ -21,11 +21,11 @@
 [logger]
     Path        = "runtime/gf-admin"
     Level       = "all"
-    Stdout      = true
+    Stdout      = false
     [logger.default]
     path = "runtime/gf-admin"
     level = "all"
-    stdout = true
+#    stdout = true
     [logger.token]
       path = "runtime/token"
       level = "all"
@@ -38,9 +38,13 @@
       path = "runtime/ws"
       level = "all"
       stdout = true
+    [logger.deposit_withdraw]
+    path = "runtime/deposit_withdraw"
+    level = "all"
+    stdout = true
 # Database.
 [database]
-    link  = "mysql:root:secret@tcp(127.0.0.1:3306)/gf-admin"
+    link  = "mysql:root:secret@tcp(127.0.0.1:3306)/binance"
     debug = true
     # Database logger.
     [database.logger]
@@ -58,7 +62,7 @@
     MultiLogin = true #是否支持多点登录，默认false
 [casbin]
     driverName = "mysql"
-    dataSourceName = "root:secret@tcp(127.0.0.1:3306)/gf-admin"
+    dataSourceName = "root:secret@tcp(127.0.0.1:3306)/binance"
     tableName = "ga_casbin_rule"
     ignoreUrls = ["/administrator-get-logged-info","/routes","/logout"]
 # Redis数据库配置
@@ -74,7 +78,7 @@
 
 
 [[gfcli.gen.dao]]
-   link     = "mysql:root:secret@tcp(127.0.0.1:3306)/gf-admin"
+   link     = "mysql:root:secret@tcp(127.0.0.1:3306)/binance"
    removePrefix = "ga_"
    overwriteDao = true
    modelFile = "all.go"
