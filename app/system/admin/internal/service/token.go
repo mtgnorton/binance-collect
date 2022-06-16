@@ -4,6 +4,7 @@ import (
 	"context"
 	"gf-admin/app/model"
 	"gf-admin/app/shared"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 )
@@ -38,9 +39,9 @@ func (a *adminTokenHandle) GetAdministrator(ctx context.Context) (administrator 
 		a.LoadConfig()
 	}
 
-	if a.administrator != nil && a.administrator.Id != 0 {
-		return a.administrator, nil
-	}
+	//if a.administrator != nil && a.administrator.Id != 0 {
+	//	return a.administrator, nil
+	//}
 	data := shared.Context.GetUser(ctx)
 	administrator = &model.AdministratorSummary{}
 	err = gconv.Scan(data, &administrator)

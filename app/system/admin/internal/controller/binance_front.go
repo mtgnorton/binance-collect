@@ -6,7 +6,7 @@ import (
 	"gf-admin/app/system/admin/internal/service"
 )
 
-var Binance = binanceApi{}
+var BinanceApi = binanceApi{}
 
 type binanceApi struct{}
 

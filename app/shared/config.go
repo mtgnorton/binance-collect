@@ -55,6 +55,16 @@ func (c *config) GetString(ctx context.Context, module, key string) (string, err
 func (c *config) Gets(ctx context.Context, module string, keys ...string) (values map[string]*gvar.Var, err error) {
 
 	values = make(map[string]*gvar.Var)
+
+	if len(keys) == 0 {
+		keysVar, err := dao.Config.Ctx(ctx).Where(dao.Config.Columns.Module, module).Array(dao.Config.Columns.Key)
+		if err != nil {
+			return nil, err
+		}
+		for _, keyVar := range keysVar {
+			keys = append(keys, keyVar.String())
+		}
+	}
 	for _, key := range keys {
 		v, innerErr := c.Get(ctx, module, key)
 		if innerErr != nil {

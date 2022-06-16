@@ -77,7 +77,7 @@ func TestBinanceApi_ApplyWithdraw(t *testing.T) {
 			"ExternalUserId":  1,
 			"Value":           0.1,
 			"To":              "0x991195b40a5bDF4725AfbD4f10F579BCa25308F5",
-			"UserAddress":     "0x84b2d9c9b870ca47719e17e8cf790d66686743c8",
+			"BinanceAdmin":    "0x84b2d9c9b870ca47719e17e8cf790d66686743c8",
 			"Symbol":          "BNB",
 		})
 

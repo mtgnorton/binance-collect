@@ -3,8 +3,6 @@ package deposit_withdraw
 import (
 	"testing"
 
-	"github.com/gogf/gf/v2/frame/g"
-
 	"github.com/gogf/gf/v2/test/gtest"
 )
 
@@ -14,12 +12,12 @@ func InitManager() {
 
 	manager = NewManager(ctx)
 
-	_, _ = g.DB().Exec(ctx, "truncate table collects;")
-	_, _ = g.DB().Exec(ctx, "truncate table queue_task;")
-	_, _ = g.DB().Exec(ctx, "truncate table queue_task_log;")
-	_, _ = g.DB().Exec(ctx, "truncate table withdraws;")
-	_, _ = g.DB().Exec(ctx, "truncate table notify;")
-	_, _ = g.DB().Exec(ctx, "truncate table notify_log;")
+	//_, _ = g.DB().Exec(ctx, "truncate table collects;")
+	//_, _ = g.DB().Exec(ctx, "truncate table queue_task;")
+	//_, _ = g.DB().Exec(ctx, "truncate table queue_task_log;")
+	//_, _ = g.DB().Exec(ctx, "truncate table withdraws;")
+	//_, _ = g.DB().Exec(ctx, "truncate table notify;")
+	//_, _ = g.DB().Exec(ctx, "truncate table notify_log;")
 }
 
 func Test_Manager_Detect(t *testing.T) {
