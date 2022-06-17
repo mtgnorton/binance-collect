@@ -27,6 +27,9 @@ func Wrap(err error, message string, contextArgs ...interface{}) error {
 
 // 获取嵌套最深的gerror的堆栈信息
 func Stack(err error) string {
+	if err == nil {
+		return ""
+	}
 	message := "\n0. " + err.Error() //先获取完整的错误信息
 	layer := 0
 	for {

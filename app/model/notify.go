@@ -1,5 +1,7 @@
 package model
 
+import "gf-admin/app/model/entity"
+
 const (
 	NOTIFY_TYPE_RECHARGE = "recharge"
 	NOTIFY_TYPE_WITHDRAW = "withdraw"
@@ -12,3 +14,8 @@ const (
 
 	NOTIFY_MAX_RETRY_AMOUNT = 8
 )
+
+type FrontNotify struct {
+	Notify *entity.Notify      `json:"notify"`
+	Logs   []*entity.NotifyLog `json:"logs"`
+}

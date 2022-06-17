@@ -163,6 +163,7 @@ CREATE TABLE `withdraws`
 (
     `id`                int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
     `user_id`           int(11)          NOT NULL DEFAULT 0 COMMENT '内部用户id',
+    `user_address`      varchar(255)     NOT NULL DEFAULT '''' COMMENT '用户地址',
     `external_order_id` varchar(255)     NOT NULL DEFAULT '' COMMENT '外部订单id',
     `external_user_id`  varchar(255)     NOT NULL DEFAULT '' COMMENT '外部用户id',
     `hash`              varchar(255)     NOT NULL DEFAULT '' COMMENT 'hash',

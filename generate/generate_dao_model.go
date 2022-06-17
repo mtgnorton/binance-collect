@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	table := "notify" //ga_admin_log
+	table := "withdraws" //ga_admin_log
 	ctx := gctx.New()
 
 	command := "gf gen dao"

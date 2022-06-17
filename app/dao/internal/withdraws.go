@@ -21,6 +21,7 @@ type WithdrawsDao struct {
 type WithdrawsColumns struct {
 	Id              string // ID
 	UserId          string // 内部用户id
+	UserAddress     string // 用户地址
 	ExternalOrderId string // 外部订单id
 	ExternalUserId  string // 外部用户id
 	Hash            string // hash
@@ -38,6 +39,7 @@ type WithdrawsColumns struct {
 var withdrawsColumns = WithdrawsColumns{
 	Id:              "id",
 	UserId:          "user_id",
+	UserAddress:     "user_address",
 	ExternalOrderId: "external_order_id",
 	ExternalUserId:  "external_user_id",
 	Hash:            "hash",

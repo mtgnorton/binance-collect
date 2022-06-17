@@ -11,6 +11,8 @@ import (
 	"gf-admin/utility/custom_error"
 	"math/big"
 
+	"github.com/gogf/gf/v2/os/gcache"
+
 	"github.com/gogf/gf/v2/text/gstr"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -82,6 +84,11 @@ func (b *binanceService) ApplyWithdraw(ctx context.Context, in *define.ApplyWith
 
 	//valueWeiBigInt, _ := valueWei.Int(big.NewInt(0)) // 使用Big.int 数据库里面存储的是100000000000000000,使用big.float存储的是1e+17
 
+	_, err = gcache.Remove(ctx, model.CACHE_KEY_USER_ADDRESSES)
+	if err != nil {
+		return out, err
+	}
+
 	_, err = dao.Withdraws.Ctx(ctx).OmitEmptyData().Insert(dto.Withdraws{
 		ExternalOrderId: in.ExternalOrderId,
 		ExternalUserId:  in.ExternalUserId,
@@ -89,6 +96,7 @@ func (b *binanceService) ApplyWithdraw(ctx context.Context, in *define.ApplyWith
 		Value:           valueWei.String(),
 		To:              in.To,
 		UserId:          idVar.Int(),
+		UserAddress:     in.UserAddress,
 		Status:          model.WITHDRAW_STATUS_WAIT,
 	})
 

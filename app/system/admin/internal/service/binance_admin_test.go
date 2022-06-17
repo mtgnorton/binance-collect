@@ -59,3 +59,48 @@ func TestBinanceAdmin_WithdrawList(t *testing.T) {
 		g.Dump(out)
 	})
 }
+
+func TestBinanceAdmin_QueueTaskList(t *testing.T) {
+	g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-unit.toml") //单元测试时，日志输出会作为响应返回，所以暂时建立专门的测试配置文件关闭所有log输出
+
+	gtest.C(t, func(t *gtest.T) {
+		var out, err = BinanceAdmin.QueueTaskList(ctx, &define.QueueTaskListInput{
+			PageSizeInput: model.PageSizeInput{
+				Page: 1,
+				Size: 10,
+			},
+		})
+		t.AssertNil(err)
+		g.Dump(out)
+	})
+}
+
+func TestBinanceAdmin_NotifyList(t *testing.T) {
+	g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-unit.toml") //单元测试时，日志输出会作为响应返回，所以暂时建立专门的测试配置文件关闭所有log输出
+
+	gtest.C(t, func(t *gtest.T) {
+		var out, err = BinanceAdmin.NotifyList(ctx, &define.NotifyListInput{
+			PageSizeInput: model.PageSizeInput{
+				Page: 1,
+				Size: 10,
+			},
+		})
+		t.AssertNil(err)
+		g.Dump(out)
+	})
+}
+
+func TestBinanceAdmin_ContractList(t *testing.T) {
+	g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-unit.toml") //单元测试时，日志输出会作为响应返回，所以暂时建立专门的测试配置文件关闭所有log输出
+
+	gtest.C(t, func(t *gtest.T) {
+		var out, err = BinanceAdmin.ContractList(ctx, &define.ContractListInput{
+			PageSizeInput: model.PageSizeInput{
+				Page: 1,
+				Size: 10,
+			},
+		})
+		t.AssertNil(err)
+		g.Dump(out)
+	})
+}

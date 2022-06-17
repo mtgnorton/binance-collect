@@ -175,11 +175,18 @@ func (b *BscChain) GetDetectNumber(ctx context.Context) (newestNumber, detectNum
 	}
 	newestNumber -= b.delayNumber
 
-	v, err := dao.LoseBlocks.Ctx(ctx).Where(dao.LoseBlocks.Columns().Status, model.LOSE_BLOCKS_STATE_NO_FINISH).Value(dao.LoseBlocks.Columns().Number)
+	v, err := dao.LoseBlocks.Ctx(ctx).Where(dao.LoseBlocks.Columns().Status, model.LOSE_BLOCK_STATUS_WAIT).Value(dao.LoseBlocks.Columns().Number)
 	if err != nil {
 		return newestNumber, 0, custom_error.New(err.Error())
 	}
 	if v.Int() > 0 {
+		// 为了避免检测后每次都查询 loseBlocks 表，在此时直接将区块改成已经检测
+		_, err = dao.LoseBlocks.Ctx(ctx).Where(dao.LoseBlocks.Columns().Status, model.LOSE_BLOCK_STATUS_WAIT).Update(g.Map{
+			dao.LoseBlocks.Columns().Status: model.LOSE_BLOCK_STATUS_FINISH,
+		})
+		if err != nil {
+			return newestNumber, 0, err
+		}
 		return newestNumber, v.Int(), nil
 	}
 

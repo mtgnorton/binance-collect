@@ -41,7 +41,6 @@ func (m *Manager) Run(ctx context.Context) {
 	m.transactionTransfer.Run(ctx)
 	m.transactionNotifier.Run(ctx)
 	m.transactionScanner.Scan(ctx, m.transactionTransfer.Ch, m.transactionNotifier.Ch)
-	select {}
 }
 
 // 检测是否有新的交易

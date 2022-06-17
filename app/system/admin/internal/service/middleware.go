@@ -7,14 +7,15 @@ import (
 	"gf-admin/app/dto"
 	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
+	"reflect"
+	"strings"
+
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gutil"
-	"reflect"
-	"strings"
 )
 
 // 中间件管理服务
@@ -169,8 +170,13 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 	}
 
 	isAllow, err := Enforcer.Auth(administrator.Username, path, method)
-	if err != nil || !isAllow {
+
+	if err != nil {
 		response.JsonErrorLogExit(r, custom_error.Wrap(err, "没有权限", g.Map{"administrator": administrator}))
+	}
+
+	if !isAllow {
+		response.JsonErrorLogExit(r, custom_error.New("没有权限", g.Map{"administrator": administrator}))
 	}
 	r.Middleware.Next()
 }

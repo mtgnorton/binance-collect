@@ -7,7 +7,7 @@
 	sessionPath =  "temp/sessions"    # Session文件存储目录
     openapiPath =  "/api.json"
     swaggerPath =  "/swagger"
-    prefix      =  "/admin/api"
+    prefix      =  "/admin-api"
 
     ServerRoot  = "public"
 	#indexFiles          = ["index.html","index.htm"]   # 自动首页静态文件检索。默认为["index.html", "index.htm"]

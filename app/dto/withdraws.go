@@ -14,6 +14,7 @@ type Withdraws struct {
 	g.Meta          `orm:"table:withdraws, do:true"`
 	Id              interface{} // ID
 	UserId          interface{} // 内部用户id
+	UserAddress     interface{} // 用户地址
 	ExternalOrderId interface{} // 外部订单id
 	ExternalUserId  interface{} // 外部用户id
 	Hash            interface{} // hash
