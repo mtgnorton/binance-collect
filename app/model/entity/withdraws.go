@@ -12,6 +12,7 @@ import (
 type Withdraws struct {
 	Id              uint        `json:"id"                ` // ID
 	UserId          int         `json:"user_id"           ` // 内部用户id
+	UserAddress     string      `json:"user_address"      ` // 用户地址
 	ExternalOrderId string      `json:"external_order_id" ` // 外部订单id
 	ExternalUserId  string      `json:"external_user_id"  ` // 外部用户id
 	Hash            string      `json:"hash"              ` // hash
