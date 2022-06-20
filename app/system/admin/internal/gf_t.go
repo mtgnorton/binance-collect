@@ -8,10 +8,16 @@ type A struct {
 
 func main() {
 
-	as := A{}
+	var a [5]int
 
-	for _, item := range as.a {
-		fmt.Println(item)
-	}
+	a[0] = 1
+
+	fmt.Println(a)
+
+	b := new([]int)
+
+	(*b)[0] = 1
+
+	fmt.Println(b)
 
 }

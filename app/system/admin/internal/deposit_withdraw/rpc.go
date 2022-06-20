@@ -196,7 +196,7 @@ func (rpc *RpcClient) callRetry(method string, params ...interface{}) (json.RawM
 		time.Sleep(sleepTime * time.Duration(i+1))
 	}
 
-	logInfofDw(context.TODO(), "after %d attempts, last error: %v", attempts, err)
+	LogInfofDw(context.TODO(), "after %d attempts, last error: %v", attempts, err)
 	return res, err
 
 }
@@ -230,7 +230,7 @@ func (rpc *RpcClient) call(method string, params ...interface{}) (json.RawMessag
 		return nil, err
 	}
 	if rpc.Debug {
-		logInfofDw(ctx, "%s\nRequest: %s\nResponse: %s\n", method, body, data)
+		LogInfofDw(ctx, "%s\nRequest: %s\nResponse: %s\n", method, body, data)
 	}
 
 	resp := new(RpcRes)

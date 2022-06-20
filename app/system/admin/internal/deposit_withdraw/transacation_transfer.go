@@ -7,9 +7,9 @@ import (
 	"gf-admin/utility/custom_error"
 	"math/big"
 
-	"github.com/gogf/gf/v2/util/grand"
+	"github.com/gogf/gf/v2/text/gstr"
 
-	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/util/grand"
 
 	"github.com/gogf/gf/v2/os/gtime"
 
@@ -43,7 +43,7 @@ func (qc *TransactionTransfer) Consume(ctx context.Context, task *TransferTask) 
 		task.Hash = "temp:" + gtime.TimestampMicroStr() + grand.Letters(10)
 		id, err := dao.QueueTask.Ctx(ctx).InsertAndGetId(task)
 		if err != nil {
-			logErrorfDw(ctx, custom_error.Wrap(err, "failed to insert queue task", g.Map{
+			LogErrorfDw(ctx, custom_error.Wrap(err, "failed to insert queue task", g.Map{
 				"task": task,
 			}))
 			return
@@ -91,18 +91,19 @@ func (qc *TransactionTransfer) Consume(ctx context.Context, task *TransferTask) 
 
 	var hash string
 
-	logInfofDw(ctx, "send tx data %#v", *legacyTx)
+	// todo 在实际发送交易时，需要再判断一次判断余额是否足够
+	LogInfofDw(ctx, "send tx data %#v", *legacyTx)
 	hash, err = ChainClient.SendTransaction(ctx, legacyTx, task.PrivateKey, task.ContractAddress)
 
 	if err != nil {
 
 		isNotTry := false
 		// 根据错误类型判断是否重试
-		gcode := gerror.Code(err)
-		if gcode.Code() == model.QUEUE_FAIL_BALANCE_INSUFFICIENT {
+
+		if gstr.Contains(err.Error(), "insufficient funds for gas * price + value") {
 			isNotTry = true
 		}
-		task.MarkFail(ctx, custom_error.Wrap(err, "transfer fail", g.Map{
+		task.MarkFail(ctx, custom_error.Wrap(err, "transfer fail 余额不足 ", g.Map{
 			"task": *task,
 			"tx": g.Map{
 				"nonce":           nonce,
@@ -129,7 +130,7 @@ func (qc *TransactionTransfer) Consume(ctx context.Context, task *TransferTask) 
 	})
 
 	if err != nil {
-		logErrorfDw(ctx, custom_error.Wrap(err, "update error", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "update error", g.Map{
 			"task": *task,
 		}))
 		return
@@ -137,7 +138,7 @@ func (qc *TransactionTransfer) Consume(ctx context.Context, task *TransferTask) 
 	err = task.SendAfterFunc(ctx)
 
 	if err != nil {
-		logErrorfDw(ctx, custom_error.Wrap(err, "transfer SendAfterFunc", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "transfer SendAfterFunc", g.Map{
 			"task": *task,
 		}))
 		return

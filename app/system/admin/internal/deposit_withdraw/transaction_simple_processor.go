@@ -22,13 +22,19 @@ func (tp *TransactionSimpleProcessor) DistinguishAndParse(ctx context.Context, b
 
 	transactions := make([]*Transaction, 0)
 	for _, originTransaction := range blockInfo.Transactions {
-		isInterior, err := tp.isNeedTransaction(ctx, &originTransaction)
+		transaction, err := NewTransaction(ctx, &originTransaction)
+		isInterior, err := transaction.IsInterior(ctx)
+
 		if err != nil {
 			return nil, err
 		}
 		if isInterior {
-			logInfofDw(ctx, "interior tx %#v", originTransaction)
-			transaction, err := NewTransaction(ctx, &originTransaction)
+			_, err = transaction.SetType(ctx)
+			if err != nil {
+				return nil, err
+			}
+			LogInfofDw(ctx, "interior tx %#v", transaction)
+
 			if err != nil {
 				return nil, custom_error.Wrap(err, "解析交易失败", g.Map{
 					"transaction": originTransaction,
@@ -42,53 +48,20 @@ func (tp *TransactionSimpleProcessor) DistinguishAndParse(ctx context.Context, b
 
 }
 
-// 判断是否是站内交易
-func (tp *TransactionSimpleProcessor) isNeedTransaction(ctx context.Context, tx *OriginTransaction) (bool, error) {
-
-	feeWithdrawAddress, err := ChainClient.GetFeeWithdrawAddress(ctx)
-	if err != nil {
-		return false, err
-	}
-	collectAddress, err := ChainClient.GetCollectAddress(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	if tx.To == collectAddress || tx.From == collectAddress || tx.From == feeWithdrawAddress {
-		return true, nil
-	}
-
-	//判断是否是需要归集的erc20
-	contracts, err := ChainClient.GetContracts(ctx)
-	if err != nil {
-		return false, err
-	}
-	_, ok := contracts[tx.To]
-
-	if ok {
-		return true, nil
-	}
-
-	userAddresses, err := ChainClient.GetUserAddresses(ctx)
-	if err != nil {
-		return false, err
-	}
-	if _, ok := userAddresses[tx.To]; ok {
-		return true, nil
-	}
-	if _, ok := userAddresses[tx.From]; ok {
-		return true, nil
-	}
-
-	return false, nil
-}
-
-// HandleRecharge 将检测到的充值记录写入到collects表中，状态为待转手续费
+// HandleRecharge 将检测到的充值记录写入到 collects 表中，状态为 model.COLLECT_STATUS_WAIT_FEE
 func (tp *TransactionSimpleProcessor) HandleRecharge(ctx context.Context, transaction *Transaction) error {
-	logInfofDw(ctx, "new recharge transaction:%#v", transaction)
+	LogInfofDw(ctx, "new recharge transaction:%#v", transaction)
+	// 判断hash是否重复
 	d := dao.Collects.Ctx(ctx)
+
+	idVar, err := d.Where(dao.Collects.Columns().RechargeHash, transaction.Hash).Value(dao.Collects.Columns().Id)
+	if idVar.Int() > 0 {
+		return custom_error.New("recharge hash already exists", g.Map{
+			"transaction": transaction,
+		})
+	}
 	//value为实际归集金额， 实际归集金额应该等于充值金额-手续费,该操作在扫描归集时进行
-	_, err := d.OmitEmptyData().Insert(dto.Collects{
+	_, err = d.OmitEmptyData().Insert(dto.Collects{
 		Symbol:          transaction.Symbol,
 		RechargeHash:    transaction.Hash,
 		Status:          model.COLLECT_STATUS_WAIT_FEE,
@@ -102,10 +75,24 @@ func (tp *TransactionSimpleProcessor) HandleRecharge(ctx context.Context, transa
 
 // HandleFee 根据hash更新collects表为 model.COLLECT_STATUS_WAIT_COLLECT  ，queue_task表的状态为 model.QUEUE_TASK_STATUS_SUCCESS
 func (tp *TransactionSimpleProcessor) HandleFee(ctx context.Context, transaction *Transaction) error {
-	logInfofDw(ctx, "new fee transaction:%#v", transaction)
+	LogInfofDw(ctx, "new fee transaction:%#v", transaction)
 	err := dao.Collects.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
+
+		// 判断是否重复处理
+		idVar, err := dao.Collects.Ctx(ctx).
+			Where(dao.Collects.Columns().CollectHash, transaction.Hash).
+			Where(dao.Collects.Columns().Status, g.Slice{
+				model.COLLECT_STATUS_WAIT_COLLECT, model.COLLECT_STATUS_PROCESS_COLLECT, model.COLLECT_STATUS_WAIT_NOTIFY, model.COLLECT_STATUS_PROCESS_NOTIFY, model.COLLECT_STATUS_FINISH_NOTIFY,
+			}).
+			Value(dao.Collects.Columns().Id)
+		if idVar.Int() > 0 {
+			return custom_error.New("HandleFee hash has handle", g.Map{
+				"transaction": transaction,
+			})
+		}
+
 		// 根据充值hash找到collect表对应的记录并更新状态为 model.COLLECT_STATUS_WAIT_COLLECT
-		_, err := dao.Collects.Ctx(ctx).Update(g.Map{
+		_, err = dao.Collects.Ctx(ctx).Update(g.Map{
 			dao.Collects.Columns().Status: model.COLLECT_STATUS_WAIT_COLLECT,
 		}, g.Map{
 			dao.Collects.Columns().HandfeeHash: transaction.Hash,
@@ -132,10 +119,24 @@ func (tp *TransactionSimpleProcessor) HandleFee(ctx context.Context, transaction
 //  HandleCollect 根据hash更新collects表为 model.COLLECT_STATUS_WAIT_NOTIFY，queue_task表的状态为 model.QUEUE_TASK_STATUS_SUCCESS
 func (tp *TransactionSimpleProcessor) HandleCollect(ctx context.Context, transaction *Transaction) error {
 
-	logInfofDw(ctx, "new collect transaction:%#v", transaction)
+	LogInfofDw(ctx, "new collect transaction:%#v", transaction)
 	err := dao.Collects.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
+
+		// 判断是否重复处理
+		idVar, err := dao.Collects.Ctx(ctx).
+			Where(dao.Collects.Columns().CollectHash, transaction.Hash).
+			Where(dao.Collects.Columns().Status, g.Slice{
+				model.COLLECT_STATUS_WAIT_NOTIFY, model.COLLECT_STATUS_PROCESS_NOTIFY, model.COLLECT_STATUS_FINISH_NOTIFY,
+			}).
+			Value(dao.Collects.Columns().Id)
+		if idVar.Int() > 0 {
+			return custom_error.New("HandleCollect has handle", g.Map{
+				"transaction": transaction,
+			})
+		}
+
 		// 根据归集hash找到collect表对应的记录并更新状态为 model.COLLECT_STATUS_WAIT_NOTIFY
-		_, err := dao.Collects.Ctx(ctx).Update(g.Map{
+		_, err = dao.Collects.Ctx(ctx).Update(g.Map{
 			dao.Collects.Columns().Status: model.COLLECT_STATUS_WAIT_NOTIFY,
 		}, g.Map{
 			dao.Collects.Columns().CollectHash: transaction.Hash,
@@ -160,10 +161,23 @@ func (tp *TransactionSimpleProcessor) HandleCollect(ctx context.Context, transac
 
 // HandleWithdraw 根据hash更新提现表的状态为 model.WITHDRAW_STATUS_WAIT_NOTIFY, queue_task表的状态为 model.QUEUE_TASK_STATUS_SUCCESS
 func (tp *TransactionSimpleProcessor) HandleWithdraw(ctx context.Context, transaction *Transaction) error {
-	logInfofDw(ctx, "new withdraw transaction:%#v", transaction)
+	LogInfofDw(ctx, "new withdraw transaction:%#v", transaction)
 	err := dao.Withdraws.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
 
-		_, err := dao.Withdraws.Ctx(ctx).Update(g.Map{
+		// 判断hash是否重复处理
+		idVar, err := dao.Withdraws.Ctx(ctx).
+			Where(dao.Collects.Columns().HandfeeHash, transaction.Hash).
+			Where(dao.Collects.Columns().Status, g.Slice{
+				model.WITHDRAW_STATUS_WAIT_NOTIFY, model.WITHDRAW_STATUS_PROCESS_NOTIFY, model.WITHDRAW_STATUS_FINISH_NOTIFY,
+			}).
+			Value(dao.Collects.Columns().Id)
+		if idVar.Int() > 0 {
+			return custom_error.New("withdraw hash has handle", g.Map{
+				"transaction": transaction,
+			})
+		}
+
+		_, err = dao.Withdraws.Ctx(ctx).Update(g.Map{
 			dao.Withdraws.Columns().Status: model.WITHDRAW_STATUS_WAIT_NOTIFY,
 		}, g.Map{
 			dao.Withdraws.Columns().Hash: transaction.Hash,

@@ -55,20 +55,21 @@ func NewTransaction(ctx context.Context, origin *OriginTransaction) (*Transactio
 
 		contracts, err := ChainClient.GetContracts(ctx)
 		if err != nil {
-			return nil, err
+			return t, err
 		}
 		var contract entity.Contracts
 		var ok bool
 		if contract, ok = contracts[gstr.ToLower(origin.To)]; !ok {
-			return nil, nil
+			return t, nil
 		}
+
 		if len(origin.Input) < 11 { //transfer的长度肯定大于11，所以不是转账交易
-			return nil, nil
+			return t, nil
 		}
 
 		methodName := origin.Input[:10]
 		if methodName != model.CONTRACT_TRANSFER_FUCTION_HEX {
-			return nil, nil
+			return t, nil
 		}
 
 		t.ContractAddress = gstr.ToLower(t.To)
@@ -82,30 +83,65 @@ func NewTransaction(ctx context.Context, origin *OriginTransaction) (*Transactio
 		_, ok = t.Value.SetString(value, 16) //将金额转为10进制
 
 		if !ok {
-			return nil, custom_error.New("合约交易设置转账金额失败")
+			return t, custom_error.New("合约交易设置转账金额失败")
 		}
 	}
 
 	t.ValueDecimal.Quo(new(big.Float).SetInt(&t.Value), new(big.Float).SetFloat64(math.Pow(10, float64(t.SymbolDecimal))))
 
-	//判断具体的交易类型，是充值，归集，手续费，还是提现
-	userAddresses, err := ChainClient.GetUserAddresses(ctx)
-	if err != nil {
-		return nil, err
-	}
+	return t, nil
+
+}
+
+//IsInterior 判断是否是内部交易
+func (t *Transaction) IsInterior(ctx context.Context) (bool, error) {
 	feeWithdrawAddress, err := ChainClient.GetFeeWithdrawAddress(ctx)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 	collectAddress, err := ChainClient.GetCollectAddress(ctx)
 	if err != nil {
-		return nil, err
+		return false, err
+	}
+
+	if t.To == collectAddress || t.From == collectAddress || t.From == feeWithdrawAddress {
+		return true, nil
+	}
+
+	userAddresses, err := ChainClient.GetUserAddresses(ctx)
+	if err != nil {
+		return false, err
+	}
+	if _, ok := userAddresses[t.To]; ok {
+		return true, nil
+	}
+	if _, ok := userAddresses[t.From]; ok {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// SetType 设置交易的类型
+func (t *Transaction) SetType(ctx context.Context) (*Transaction, error) {
+	//判断具体的交易类型，是充值，归集，手续费，还是提现
+	userAddresses, err := ChainClient.GetUserAddresses(ctx)
+	if err != nil {
+		return t, err
+	}
+	feeWithdrawAddress, err := ChainClient.GetFeeWithdrawAddress(ctx)
+	if err != nil {
+		return t, err
+	}
+	collectAddress, err := ChainClient.GetCollectAddress(ctx)
+	if err != nil {
+		return t, err
 	}
 
 	fromUser, fromAddressIsUser := userAddresses[t.From]
 	toUser, toAddressIsUser := userAddresses[t.To]
 
-	logInfofDw(ctx, "tx symbol is %s,from address is %s, to address is %s, feewithdraw address is %s,collect address is %s \n", t.Symbol, t.From, t.To, feeWithdrawAddress, collectAddress)
+	LogInfofDw(ctx, "tx symbol is %s,from address is %s, to address is %s, feewithdraw address is %s,collect address is %s \n", t.Symbol, t.From, t.To, feeWithdrawAddress, collectAddress)
 	// 充值: 转入地址是平台生成的用户地址,转出地址不是手续费提现地址为充值
 	if toAddressIsUser && t.From != feeWithdrawAddress {
 
@@ -123,7 +159,7 @@ func NewTransaction(ctx context.Context, origin *OriginTransaction) (*Transactio
 
 		userIdVar, err := dao.Withdraws.Ctx(ctx).Where(dao.Withdraws.Columns().Hash, t.Hash).Value(dao.Withdraws.Columns().UserId)
 		if err != nil {
-			return nil, custom_error.Wrap(err, "查询提现记录失败", g.Map{
+			return t, custom_error.Wrap(err, "查询提现记录失败", g.Map{
 				"hash": t.Hash,
 			})
 		}

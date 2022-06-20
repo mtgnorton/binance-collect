@@ -18,7 +18,7 @@ type TransferTask struct {
 // 将一个任务标记为失败，并且可以将失败次数设置为最大，在某些情况下应该设为不再重试，如余额不足
 func (task *TransferTask) MarkFail(ctx context.Context, recordErr error, isNotTry ...bool) {
 
-	logErrorfDw(ctx, recordErr)
+	LogErrorfDw(ctx, recordErr)
 
 	failAmount := 1
 
@@ -58,7 +58,7 @@ func (task *TransferTask) MarkFail(ctx context.Context, recordErr error, isNotTr
 		return err
 	})
 	if err != nil {
-		logErrorfDw(ctx, custom_error.Wrap(err, "failed to update transfer log", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "failed to update transfer log", g.Map{
 			"task": *task,
 		}))
 	}

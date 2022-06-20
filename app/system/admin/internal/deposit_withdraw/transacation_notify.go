@@ -39,7 +39,7 @@ func (tn *TransactionNotifier) Consume(ctx context.Context, task *NotifyTask) {
 	if task.Id == 0 {
 		id, err := dao.Notify.Ctx(ctx).InsertAndGetId(task)
 		if err != nil {
-			logErrorfDw(ctx, custom_error.Wrap(err, "failed to insert notify", g.Map{
+			LogErrorfDw(ctx, custom_error.Wrap(err, "failed to insert notify", g.Map{
 				"task": *task,
 			}))
 			return
@@ -72,7 +72,7 @@ func (tn *TransactionNotifier) Consume(ctx context.Context, task *NotifyTask) {
 	err = task.SendAfterFunc(ctx)
 
 	if err != nil {
-		logErrorfDw(ctx, custom_error.Wrap(err, "notify SendAfterFunc", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "notify SendAfterFunc", g.Map{
 			"task": *task,
 		}))
 		return
@@ -88,7 +88,7 @@ func (tn *TransactionNotifier) Send(ctx context.Context, data map[string]interfa
 	resp, err := http.Post(link,
 		"application/x-www-form-urlencoded", strings.NewReader(args))
 
-	logInfofDw(ctx, "send notify,link is :"+link+",data is :"+args)
+	LogInfofDw(ctx, "send notify,link is :"+link+",data is :"+args)
 	if err != nil {
 		return "", custom_error.Wrap(err, "failed to send notify", g.Map{
 			"data": data,

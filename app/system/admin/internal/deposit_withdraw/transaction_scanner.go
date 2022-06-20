@@ -34,14 +34,14 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 	gtimer.AddSingleton(ctx, ts.scanInterval, func(ctx context.Context) {
 		tranferTasks, err := ts.scanTxFee(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range tranferTasks {
 			chTransfer <- task
 		}
 		tranferTasks, err = ts.scanTxCollect(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 
 		for _, task := range tranferTasks {
@@ -50,7 +50,7 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 
 		tranferTasks, err = ts.scanTxWithdraw(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range tranferTasks {
 			chTransfer <- task
@@ -58,7 +58,7 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 
 		tranferTasks, err = ts.scanFailTxTransferTask(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range tranferTasks {
 			chTransfer <- task
@@ -66,7 +66,7 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 
 		notifyTasks, err := ts.scanNotifyCollect(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range notifyTasks {
 			chNotify <- task
@@ -74,7 +74,7 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 
 		notifyTasks, err = ts.scanNotifyWithdraw(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range notifyTasks {
 			chNotify <- task
@@ -82,7 +82,7 @@ func (ts *TransactionScanner) Scan(ctx context.Context, chTransfer chan *Transfe
 
 		notifyTasks, err = ts.scanFailNotify(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		for _, task := range notifyTasks {
 			chNotify <- task
@@ -124,7 +124,7 @@ func (ts *TransactionScanner) scanTxFee(ctx context.Context) ([]*TransferTask, e
 		return tasks, err
 	}
 
-	logInfofDw(ctx, "scanTxFee begin,tx length: %d", len(collects))
+	LogInfofDw(ctx, "scanTxFee begin,tx length: %d", len(collects))
 	for _, collect := range collects {
 		onceFee, err := ChainClient.GetProbablyOnceGasPrice(ctx, collect.Symbol)
 		if err != nil {
@@ -139,18 +139,25 @@ func (ts *TransactionScanner) scanTxFee(ctx context.Context) ([]*TransferTask, e
 
 		// 当归集法币时，不需要转出手续费，只需要将归集的法币数量设置为rechargeValue-onceFee即可
 		if collect.Symbol == model.CONTRACT_DEFAULT_SYMBOL {
+			g.Dump(rechargeValue.String(), onceFee.String(), "ffffff")
 			actualValue = rechargeValue.Sub(rechargeValue, &onceFee)
+			if actualValue.Cmp(big.NewInt(0)) < 0 {
+				actualValue = big.NewInt(0)
+			}
 		}
 
-		// todo 充值的金额应该大于某个值才进行归集
-		// 5000000000000为一次手续费的数量
-		settingMinRechargeValue := big.NewInt(10000000000000)
+		settingMinRechargeValue, err := ChainClient.GetMinCollectValue(ctx)
+		if err != nil {
+			return tasks, custom_error.Wrap(err, "GetMinCollectValue error", g.Map{"collect": collect})
+		}
+
+		// 210000000000000 为一次手续费的数量
 
 		//如果充值的金额小于设定的最小充值金额，则不进行归集
 		if settingMinRechargeValue.Cmp(actualValue) > 0 {
 
 			_, err = dao.Collects.Ctx(ctx).Update(g.Map{
-				dao.Collects.Columns().Status: model.COLLECT_STATUS_MISS,
+				dao.Collects.Columns().Status: model.COLLECT_STATUS_FAIl_TOO_LOW_AMOUNT,
 				dao.Collects.Columns().Value:  actualValue.String(),
 			}, g.Map{
 				dao.Collects.Columns().Id: collect.Id,
@@ -237,7 +244,7 @@ func (ts *TransactionScanner) scanTxCollect(ctx context.Context) ([]*TransferTas
 	if err != nil {
 		return tasks, err
 	}
-	logInfofDw(ctx, "scanTxCollect begin,tx length: %d", len(collects))
+	LogInfofDw(ctx, "scanTxCollect begin,tx length: %d", len(collects))
 
 	collectAddress, err := ChainClient.GetCollectAddress(ctx)
 	if err != nil {
@@ -347,7 +354,7 @@ func (ts *TransactionScanner) scanTxWithdraw(ctx context.Context) ([]*TransferTa
 	if err != nil {
 		return tasks, err
 	}
-	logInfofDw(ctx, "scanTxWithdraw begin,tx length: %d", len(withdraws))
+	LogInfofDw(ctx, "scanTxWithdraw begin,tx length: %d", len(withdraws))
 
 	feeWithdrawAddress, err := ChainClient.GetFeeWithdrawAddress(ctx)
 
@@ -405,7 +412,7 @@ func (ts *TransactionScanner) scanNotifyCollect(ctx context.Context) ([]*NotifyT
 	if err != nil {
 		return tasks, err
 	}
-	logInfofDw(ctx, "scanNotifyCollect begin,tx length: %d", len(collects))
+	LogInfofDw(ctx, "scanNotifyCollect begin,tx length: %d", len(collects))
 
 	notifyAddress, err := shared.Config.GetString(ctx, model.CONFIG_MODULE_BINNABCE, model.CONFIG_KEY_NOTIFY_ADDRESS)
 	if err != nil {
@@ -476,7 +483,7 @@ func (ts *TransactionScanner) scanNotifyWithdraw(ctx context.Context) ([]*Notify
 	if err != nil {
 		return tasks, err
 	}
-	logInfofDw(ctx, "scanNotifyWithdraw begin,tx length: %d", len(withdraws))
+	LogInfofDw(ctx, "scanNotifyWithdraw begin,tx length: %d", len(withdraws))
 
 	notifyAddress, err := shared.Config.GetString(ctx, model.CONFIG_MODULE_BINNABCE, model.CONFIG_KEY_NOTIFY_ADDRESS)
 	if err != nil {
@@ -533,7 +540,7 @@ func (ts *TransactionScanner) scanFailNotify(ctx context.Context) ([]*NotifyTask
 		return nil, err
 	}
 
-	logInfofDw(ctx, "scanFailNotify begin,notifies length: %d", len(notifies))
+	LogInfofDw(ctx, "scanFailNotify begin,notifies length: %d", len(notifies))
 
 	for _, notify := range notifies {
 		if notify.NotifyData == "" {

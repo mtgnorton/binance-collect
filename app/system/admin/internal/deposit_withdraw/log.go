@@ -10,7 +10,7 @@ import (
 	"github.com/gogf/gf/v2/util/gutil"
 )
 
-func logErrorfDw(ctx context.Context, err error) {
+func LogErrorfDw(ctx context.Context, err error) {
 
 	code := gerror.Code(err)
 
@@ -22,6 +22,6 @@ func logErrorfDw(ctx context.Context, err error) {
 
 }
 
-func logInfofDw(ctx context.Context, format string, v ...any) {
+func LogInfofDw(ctx context.Context, format string, v ...any) {
 	g.Log("deposit_withdraw").Infof(ctx, format, v...)
 }

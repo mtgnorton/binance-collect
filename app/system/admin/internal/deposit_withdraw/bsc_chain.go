@@ -5,7 +5,6 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"gf-admin/app/dao"
-	"gf-admin/app/dto"
 	"gf-admin/app/model"
 	"gf-admin/app/model/entity"
 	"gf-admin/app/shared"
@@ -30,6 +29,27 @@ type BscChain struct {
 	delayNumber int //区块有可能回滚，一般超过6个之后，可以确定该块已经被确认
 	netUrl      string
 	chainID     int64
+}
+
+func (b *BscChain) SetNetByConfig(ctx context.Context) error {
+
+	netType, err := shared.Config.GetString(ctx, model.CONFIG_MODULE_BINNABCE, model.CONFIG_KEY_NET_TYPE)
+	if err != nil {
+		return custom_error.New(err.Error())
+	}
+	if netType == model.CONFIG_KEY_NET_TYPE_VALUE_MAIN {
+		b.netUrl = model.CHAIN_BSC_MAIN_NET
+		b.chainID = model.CHAIN_BSC_MAIN_NET_ID
+	} else {
+		b.netUrl = model.CHAIN_BSC_TEST_NET
+		b.chainID = model.CHAIN_BSC_TEST_NET_ID
+	}
+	LogInfofDw(ctx, "SetNetByConfig netType:%s", netType)
+
+	b.SetRpcClient(NewRpcClient(ChainClient.netUrl, ChainClient.debug))
+	gcache.Remove(ctx, model.CACHE_KEY_CHAIN_NEWEST_NUMBER)
+
+	return nil
 }
 
 // 获取用户地址map,以用户地址为key
@@ -109,6 +129,25 @@ func (b *BscChain) GetCollectAddress(ctx context.Context) (string, error) {
 	return collectAddress, nil
 }
 
+//  获取最小充值金额
+
+func (b *BscChain) GetMinCollectValue(ctx context.Context) (*big.Int, error) {
+	minCollectValue, err := shared.Config.GetString(ctx, model.CONFIG_MODULE_BINNABCE, model.CONFIG_KEY_MIN_COLLECT_AMOUNT)
+	if err != nil {
+		return big.NewInt(0), custom_error.New(err.Error())
+	}
+	valueString, err := b.EtherToWei(ctx, minCollectValue, model.CONTRACT_DEFAULT_SYMBOL)
+	if err != nil {
+		return big.NewInt(0), custom_error.New(err.Error())
+	}
+	value, ok := big.NewInt(0).SetString(valueString, 10)
+	if !ok {
+		return big.NewInt(0), custom_error.New("big.NewInt(0).SetString(valueString, 10) failed")
+	}
+	return value, nil
+
+}
+
 func (b *BscChain) WeiToEther(ctx context.Context, value string, symbol string) (string, error) {
 	valueBigFloat, ok := big.NewFloat(0).SetString(value)
 	if !ok {
@@ -142,6 +181,40 @@ func (b *BscChain) WeiToEther(ctx context.Context, value string, symbol string) 
 
 	valueBigFloat = valueBigFloat.Quo(valueBigFloat, decimalBigFloat)
 	return valueBigFloat.String(), nil
+}
+
+func (b *BscChain) EtherToWei(ctx context.Context, value string, symbol string) (string, error) {
+	valueBigFloat, ok := big.NewFloat(0).SetString(value)
+	if !ok {
+		return "", custom_error.New("value string to big.float error", g.Map{
+			"value":  value,
+			"symbol": symbol,
+		})
+	}
+	contracts, err := b.GetContracts(ctx)
+
+	if err != nil {
+		return "", err
+	}
+	decimal := 0
+	for _, contract := range contracts {
+		if contract.Symbol == symbol {
+			decimal = contract.Decimals
+			break
+		}
+	}
+	if decimal == 0 {
+		return "", custom_error.New("wei to ether ,symbol corresponding contract not exist ", g.Map{
+			"value":     value,
+			"symbol":    symbol,
+			"contracts": contracts,
+		})
+	}
+	valueBigFloat = valueBigFloat.Mul(valueBigFloat, big.NewFloat(math.Pow(10, 18)))
+
+	valueInt, _ := valueBigFloat.Int(big.NewInt(0))
+
+	return valueInt.String(), nil
 }
 
 func (b *BscChain) GetDelayNumber() int {
@@ -295,15 +368,15 @@ func (b *BscChain) SendTransaction(ctx context.Context, legacyTx *types.LegacyTx
 }
 
 func (b *BscChain) GetLastNonce(ctx context.Context, address string) (uint64, error) {
-	nonceDatabase, err := dao.QueueTask.Ctx(ctx).Where(dto.QueueTask{
-		From:   address,
-		Status: model.QUEUE_TASK_STATUS_SUCCESS,
-	}).OmitEmptyWhere().Max(dao.QueueTask.Columns().Nonce)
+	nonceDatabase, err := dao.QueueTask.Ctx(ctx).
+		Where(dao.QueueTask.Columns().From, address).
+		Where(dao.QueueTask.Columns().Status, g.Slice{model.QUEUE_TASK_STATUS_SUCCESS, model.QUEUE_TASK_STATUS_PROCESS}).
+		Max(dao.QueueTask.Columns().Nonce)
 	if err != nil {
 		return 0, err
 	}
 
-	nonceNet, err := b.rpcClient.GetTransactionCount(address, "latest")
+	nonceNet, err := b.rpcClient.GetTransactionCount(address, "pending")
 
 	if err != nil {
 		return 0, err

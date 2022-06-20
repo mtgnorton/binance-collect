@@ -17,6 +17,11 @@ type Manager struct {
 }
 
 func NewManager(ctx context.Context, options ...func(manager *Manager)) *Manager {
+
+	err := ChainClient.SetNetByConfig(ctx)
+	if err != nil {
+		panic(err)
+	}
 	var manager = &Manager{
 		transactionProcessor:      NewTransactionProcessor(ctx, model.PROCESSOR_SIMPLE),
 		transactionScanner:        NewTransactionScanner(ctx, 5),
@@ -24,6 +29,7 @@ func NewManager(ctx context.Context, options ...func(manager *Manager)) *Manager
 		transactionNotifier:       NewTransactionNotifier(),
 		detectIntervalMillisecond: time.Duration(1000) * time.Millisecond,
 	}
+
 	for _, option := range options {
 		option(manager)
 	}
@@ -50,7 +56,7 @@ func (m *Manager) run(ctx context.Context) {
 
 	blockInfo, err := m.Detect(ctx)
 	if err != nil {
-		logErrorfDw(ctx, err)
+		LogErrorfDw(ctx, err)
 	}
 	// 说明此时没有新的区块产生
 	if blockInfo == nil {
@@ -59,7 +65,7 @@ func (m *Manager) run(ctx context.Context) {
 	go func() {
 		transactions, err := m.transactionProcessor.DistinguishAndParse(ctx, blockInfo)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		m.Dispatch(ctx, transactions)
 	}()
@@ -85,7 +91,7 @@ func (m *Manager) Dispatch(ctx context.Context, transactions []*Transaction) {
 			err = m.transactionProcessor.HandleWithdraw(ctx, transaction)
 		}
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 	}
 }
@@ -97,7 +103,7 @@ func (m *Manager) Detect(ctx context.Context) (*OriginBlock, error) {
 	if err != nil {
 		return nil, err
 	}
-	logInfofDw(ctx, "block detect ,newest block is %d,detect block is %d", newestNumber, detectNumber)
+	LogInfofDw(ctx, "block detect ,newest block is %d,detect block is %d", newestNumber, detectNumber)
 	if detectNumber == 0 {
 		return nil, err
 	}

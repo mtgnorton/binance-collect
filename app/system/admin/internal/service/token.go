@@ -22,7 +22,7 @@ type adminTokenHandle struct {
 func (a *adminTokenHandle) LoadConfig() *adminTokenHandle {
 	ctx := context.TODO()
 	AdminTokenInstance.TokenHandler = shared.TokenHandler{
-		CacheMode:  shared.CacheModeRedis,
+		CacheMode:  g.Cfg().MustGet(ctx, "token.CacheMode").String(),
 		Timeout:    g.Cfg().MustGet(ctx, "token.Timeout").Int(),
 		MaxRefresh: g.Cfg().MustGet(ctx, "token.MaxRefresh").Int(),
 		CacheKey:   g.Cfg().MustGet(ctx, "token.CacheKey").String(),

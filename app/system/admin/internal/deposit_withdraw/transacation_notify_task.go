@@ -57,7 +57,7 @@ func (task *NotifyTask) IsRetry(ctx context.Context) bool {
 }
 
 func (task *NotifyTask) MarkFail(ctx context.Context, recordErr error) {
-	logErrorfDw(ctx, recordErr)
+	LogErrorfDw(ctx, recordErr)
 	err := dao.Notify.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
 		_, err := dao.Notify.Ctx(ctx).Update(g.Map{
 			dao.Notify.Columns().Status:             model.NOTIFY_STATUS_FAIL,
@@ -79,7 +79,7 @@ func (task *NotifyTask) MarkFail(ctx context.Context, recordErr error) {
 		return err
 	})
 	if err != nil {
-		logErrorfDw(ctx, custom_error.Wrap(err, "failed to update notify task", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "failed to update notify task", g.Map{
 			"task": *task,
 		}))
 	}

@@ -72,6 +72,8 @@ func Run(ctx context.Context) {
 
 			group.Bind(controller.NoAuth)
 
+			group.Bind(controller.BinanceApi)
+
 			group.Group("/", func(group *ghttp.RouterGroup) {
 
 				//需要登录验证的路由

@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogf/gf/v2/frame/g"
+
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/ethereum/go-ethereum/core/types"
@@ -149,5 +151,22 @@ func TestBscChain_WeiToEther(t *testing.T) {
 		ether, err := TestClient.WeiToEther(ctx, wei, model.CONTRACT_DEFAULT_SYMBOL)
 		t.AssertNil(err)
 		fmt.Println(ether)
+	})
+}
+
+func TestBscChain_EtherToWei(t *testing.T) {
+	gtest.C(t, func(t *gtest.T) {
+		ether := "0.1"
+		wei, err := TestClient.EtherToWei(ctx, ether, model.CONTRACT_DEFAULT_SYMBOL)
+		t.AssertNil(err)
+		fmt.Println(wei)
+	})
+}
+
+func TestBscChain_GetMinCollectValue(t *testing.T) {
+	gtest.C(t, func(t *gtest.T) {
+		value, err := TestClient.GetMinCollectValue(ctx)
+		t.AssertNil(err)
+		g.Dump(value.String())
 	})
 }

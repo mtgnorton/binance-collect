@@ -288,7 +288,7 @@ func Test_Processor_Scanner_Queue(t *testing.T) {
 
 		err = collectModel.Where(condition).Scan(&collect)
 		t.AssertNil(err)
-		t.Assert(collect.Status, model.COLLECT_STATUS_MISS)
+		t.Assert(collect.Status, model.COLLECT_STATUS_FAIl_TOO_LOW_AMOUNT)
 
 		// 测试正常充值
 		//充值检测
@@ -315,7 +315,7 @@ func Test_Processor_Scanner_Queue(t *testing.T) {
 		// 归集扫描
 		tasks, err = scanner.scanTxCollect(ctx)
 		if err != nil {
-			logErrorfDw(ctx, err)
+			LogErrorfDw(ctx, err)
 		}
 		t.AssertNil(err)
 		t.Assert(len(tasks), 1)
