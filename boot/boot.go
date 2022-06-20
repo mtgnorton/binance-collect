@@ -58,7 +58,7 @@ func newDefaultAdministrator(ctx context.Context) {
 
 		_, err = dao.Administrator.Ctx(ctx).Insert(entity.Administrator{
 			Username: "admin",
-			Password: utility.EncryptPassword("admin", "admin"),
+			Password: utility.EncryptPassword("admin", "123456"),
 			Nickname: "admin",
 			Avatar:   "",
 			Status:   "",

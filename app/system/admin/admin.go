@@ -56,7 +56,9 @@ func Run(ctx context.Context) {
 
 	service.AdminTokenInstance.Init(ctx)
 
-	// 前台系统路由注册
+	go binanceApi(ctx, prefix.String())
+
+	// 后台接口路由注册
 	s.Group(prefix.String(), func(group *ghttp.RouterGroup) {
 
 		// 使用传统路由方式绑定websocket请求
@@ -71,8 +73,6 @@ func Run(ctx context.Context) {
 			//无需登录验证的路由
 
 			group.Bind(controller.NoAuth)
-
-			group.Bind(controller.BinanceApi)
 
 			group.Group("/", func(group *ghttp.RouterGroup) {
 
@@ -119,6 +119,25 @@ func Run(ctx context.Context) {
 	s.Run()
 	return
 
+}
+
+func binanceApi(ctx context.Context, prefix string) {
+	s := g.Server("binance")
+
+	s.SetPort(g.Cfg().MustGet(ctx, "binance.Port").Int())
+	s.Group(prefix, func(group *ghttp.RouterGroup) {
+		group.Middleware(
+			shared.Middleware.Ctx,
+			service.Middleware.OperationLog,
+			service.Middleware.ResponseHandler,
+		)
+		group.Bind(controller.BinanceApi)
+
+	})
+	err := s.Start()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func sessionConfig(s *ghttp.Server) {
