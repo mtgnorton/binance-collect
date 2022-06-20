@@ -21,7 +21,7 @@ func (b *binanceApi) CreateAddress(ctx context.Context, req *define.CreateAddres
 func (b *binanceApi) ApplyWithdraw(ctx context.Context, req *define.ApplyWithdrawReq) (res *define.ApplyWithdrawRes, err error) {
 	res = &define.ApplyWithdrawRes{}
 	deposit_withdraw.LogInfofDw(ctx, "a new api ApplyWithdraw call:\n %+v \n", req.ApplyWithdrawInput)
-	res.ApplyWithdrawOutput, err = service.BinanceService.ApplyWithdraw(ctx, req.ApplyWithdrawInput)
+	res.ApplyWithdrawOutput, err = service.BinanceService.ApplyWithdraw(ctx, &req.ApplyWithdrawInput)
 	return
 
 }

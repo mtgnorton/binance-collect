@@ -8,6 +8,7 @@ import (
 	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
 	"reflect"
+	"runtime/debug"
 	"strings"
 
 	"github.com/gogf/gf/v2/container/garray"
@@ -106,7 +107,10 @@ func (s *serviceMiddleware) ResponseHandler(r *ghttp.Request) {
 	)
 
 	res, err = r.GetHandlerResponse()
+
 	if err != nil {
+
+		debug.PrintStack()
 		response.JsonErrorLogExit(r, err)
 	}
 

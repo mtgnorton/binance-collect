@@ -83,29 +83,12 @@ v:"required|integer#用户ID不能为空|用户ID必须是整数"`
 
 ```azure
 type ApplyWithdrawInput struct { `
-json:"order_id" dc:"提现唯一标志符"
-v:"required|length:1,64#外部订单号不能为空|外部订单号长度不能超过64" `
-    
-`
-json:"user_id" dc:"该提现申请的用户id"
-v:"required|integer#外部用户ID不能为空|外部用户ID必须是整数" `
-
-`
-json:"value" dc:"提现金额"
-v:"required|float#金额不能为空|金额必须是数字" `
-	
-`
-json:"user_address" dc:"创建用户时，该系统返回的地址"
-v:"required|length:42,42#地址不能为空|提现地址包含0x，且总长度为42" `
-	
-`
-json:"to_address" dc:"用户提现到的地址"
-v:"required|length:42,42#提现地址不能为空|提现地址包含0x，且总长度为42" `
-	
-`
-json:"symbol" dc:"提现的货币，可选的货币如BNB,BSC-USD，根据实际项目决定"
-v:"required|length:1,32#币种不能为空|币种长度不能超过32"`
-}
+	ExternalOrderId string  `json:"external_order_id" dc:"提现唯一标志符" v:"required|length:1,64#外部订单号不能为空|外部订单号长度不能超过64"`
+	ExternalUserId  int     `json:"external_user_id" dc:"该提现申请的用户id" v:"required|integer#外部用户ID不能为空|外部用户ID必须是整数"`
+	Value           float64 `json:"value" dc:"提现金额" v:"required|float#金额不能为空|金额必须是数字"`
+	UserAddress     string  `json:"user_address" dc:"创建用户时，该系统返回的地址" v:"required|length:42,42#地址不能为空|提现地址包含0x，且总长度为42"`
+	To              string  `json:"to" dc:"用户提现到的地址" v:"required|length:42,42#提现地址不能为空|提现地址包含0x，且总长度为42"`
+	Symbol          string  `json:"symbol" dc:"提现的货币，可选的货币如BNB,BSC-USD，根据实际项目决定" v:"required|length:1,32#币种不能为空|币种长度不能超过32"`
 ```
 
 3. 充值和提现成功通知

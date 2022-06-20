@@ -71,6 +71,7 @@ func Run(ctx context.Context) {
 				service.Middleware.ResponseHandler,
 			)
 			//无需登录验证的路由
+			group.Bind(controller.BinanceApi)
 
 			group.Bind(controller.NoAuth)
 
