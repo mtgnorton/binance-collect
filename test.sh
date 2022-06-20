@@ -9,4 +9,8 @@ packName="binance-collect"
 # rm -rf /Users/mtgnorton/Coding/go/src/github.com/mtgnorton/gf-admin/public/front/*
 
 
-scp -r $backendProjectPath/bin/linux_amd64/$packName 261:/www/wwwroot/binance-collect
+
+scp -r $backendProjectPath/bin/linux_amd64/binance-collect  261:/www/wwwroot/binance-collect/
+
+#scp -r $backendProjectPath/config/config-prod.toml 261:/www/wwwroot/binance-collect/config/
+

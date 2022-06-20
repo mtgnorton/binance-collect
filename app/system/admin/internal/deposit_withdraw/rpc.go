@@ -13,8 +13,6 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 
 	"github.com/gogf/gf/v2/errors/gcode"
-
-	"github.com/gogf/gf/v2/os/gfile"
 )
 
 // EthError - ethereum error
@@ -97,7 +95,7 @@ func (rpc *RpcClient) getBlockInfo(method string, withTransactions bool, params 
 	if err != nil {
 		return nil, err
 	}
-	err = gfile.PutContents(gfile.Pwd()+"/test_data/block_15913847.json", string(result))
+	// err = gfile.PutContents(gfile.Pwd()+"/test_data/block_15913847.json", string(result))
 	if err != nil {
 		return nil, err
 	}

@@ -26,7 +26,7 @@
 ## 运行
 
 - 测试运行： ` export GF_ADMIN_ENV_FILE=local; gf run main.go`
-- 正式运行：将编译后的文件和config-prod.toml放在同一个目录下，然后使用`nohup ./binance-collect &`运行应用程序
+- 正式运行：将编译后的文件上传到服务器后，使用`nohup ./binance-collect &`运行应用程序
 - 后台默认用户名和密码为：admin 123456
 
 ## 使用说明
@@ -63,29 +63,54 @@
   私钥：0xb9d36a8552bdb5e2cf78b9908a9569911539417d743d34d73e7d52be3ae49b61
 
 ## 接口对接
-1. 创建地址 
+
+1. 创建地址
+
 - 接口：/admin-api/dw-create-address
 - 参数：
+
 ```azure
 type CreateAddressInput struct {
-	UserId int `json:"user_id" v:"required|integer#用户ID不能为空|用户ID必须是整数"`
+`json:"user_id"
+v:"required|integer#用户ID不能为空|用户ID必须是整数"`
 }
 ```
+
 2. 申请提现
+
 - 接口：/admin-api/dw-apply-withdraw
 - 参数:
+
 ```azure
-type ApplyWithdrawInput struct {
-	ExternalOrderId string  `json:"order_id" dc:"提现唯一标志符" v:"required|length:1,64#外部订单号不能为空|外部订单号长度不能超过64"`
-	ExternalUserId  int     `json:"user_id" dc:"该提现申请的用户id" v:"required|integer#外部用户ID不能为空|外部用户ID必须是整数"`
-	Value           float64 `json:"value" dc:"提现金额" v:"required|float#金额不能为空|金额必须是数字"`
-	UserAddress     string  `json:"user_address" dc:"创建用户时，该系统返回的地址" v:"required|length:42,42#地址不能为空|提现地址包含0x，且总长度为42"`
-	To              string  `json:"to_address" dc:"用户提现到的地址" v:"required|length:42,42#提现地址不能为空|提现地址包含0x，且总长度为42"`
-	Symbol          string  `json:"symbol" dc:"提现的货币，可选的货币如BNB,BSC-USD，根据实际项目决定" v:"required|length:1,32#币种不能为空|币种长度不能超过32"`
+type ApplyWithdrawInput struct { `
+json:"order_id" dc:"提现唯一标志符"
+v:"required|length:1,64#外部订单号不能为空|外部订单号长度不能超过64" `
+    
+`
+json:"user_id" dc:"该提现申请的用户id"
+v:"required|integer#外部用户ID不能为空|外部用户ID必须是整数" `
+
+`
+json:"value" dc:"提现金额"
+v:"required|float#金额不能为空|金额必须是数字" `
+	
+`
+json:"user_address" dc:"创建用户时，该系统返回的地址"
+v:"required|length:42,42#地址不能为空|提现地址包含0x，且总长度为42" `
+	
+`
+json:"to_address" dc:"用户提现到的地址"
+v:"required|length:42,42#提现地址不能为空|提现地址包含0x，且总长度为42" `
+	
+`
+json:"symbol" dc:"提现的货币，可选的货币如BNB,BSC-USD，根据实际项目决定"
+v:"required|length:1,32#币种不能为空|币种长度不能超过32"`
 }
 ```
+
 3. 充值和提现成功通知
-通知数据如下所示
+   通知数据如下所示,成功后需要返回success
+
 ```azure
 type NotifyData struct {
 	Symbol        string  # 货币名称
@@ -98,7 +123,9 @@ type NotifyData struct {
 ```
 
 ## 注意事项
+
 1. 平台内部计算金额使用的单位为wei,和外部系统交互时使用的单位为ether。
+
 ## 相关仓库
 
 

@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 	"gf-admin/app/dao"
+
+	"github.com/gogf/gf/v2/os/gres"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -49,6 +52,18 @@ func (e *enforcer) Register(ctx context.Context) {
 	if !gfile.IsFile(absolutePath) {
 		//源码的路径
 		absolutePath = gfile.Join(gfile.Pwd(), e.modelConfigPath)
+	}
+
+	if !gfile.IsFile(absolutePath) {
+		content := gres.GetContent("config/casbin_model.conf")
+		if string(content) == "" {
+			panic("casbin model config not found")
+		}
+		err := gfile.PutBytes(absolutePath, content)
+		if err != nil {
+			panic(err)
+		}
+
 	}
 
 	e.instance, err = casbin.NewEnforcer(absolutePath, adapter)

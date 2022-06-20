@@ -178,7 +178,7 @@ CREATE TABLE `ga_administrator` (
 -- Records of ga_administrator
 -- ----------------------------
 BEGIN;
-INSERT INTO `ga_administrator` VALUES (1, 'admin', '4c590c75bd7d9836e1c960ae0ed2fe7c', 'admin', '', 'normal', 'sssss', '', NULL, '2022-01-09 19:38:04', '2022-04-29 18:33:00');
+INSERT INTO `ga_administrator` VALUES (1, 'admin', 'a66abb5684c45962d887564f08346e8d', 'admin', '', 'normal', 'sssss', '', NULL, '2022-01-09 19:38:04', '2022-04-29 18:33:00');
 COMMIT;
 
 -- ----------------------------

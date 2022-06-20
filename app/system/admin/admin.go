@@ -52,7 +52,7 @@ func Run(ctx context.Context) {
 		g.Log().Fatalf(ctx, "get server admin prefix error,error info following : %s", err)
 	}
 
-	s.AddStaticPath("/admin", "/public/front")
+	//s.AddStaticPath("/admin", "/public")
 
 	service.AdminTokenInstance.Init(ctx)
 
