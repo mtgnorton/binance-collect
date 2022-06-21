@@ -9,7 +9,8 @@ import (
 	"gf-admin/app/system/admin/internal/define"
 	"gf-admin/app/system/admin/internal/deposit_withdraw"
 	"gf-admin/utility/custom_error"
-	"math/big"
+
+	"github.com/gogf/gf/v2/util/gconv"
 
 	"github.com/gogf/gf/v2/os/gcache"
 
@@ -80,9 +81,11 @@ func (b *binanceService) ApplyWithdraw(ctx context.Context, in *define.ApplyWith
 	}
 
 	// 传递过来的value单位是ether,转为 wei
-	valueWei := big.NewFloat(0).Mul(big.NewFloat(0).SetFloat64(in.Value), big.NewFloat(1e18))
+	valueWei, err := deposit_withdraw.ChainClient.EtherToWei(ctx, gconv.String(in.Value), in.Symbol)
 
-	//valueWeiBigInt, _ := valueWei.Int(big.NewInt(0)) // 使用Big.int 数据库里面存储的是100000000000000000,使用big.float存储的是1e+17
+	if err != nil {
+		return out, custom_error.New("金额转换失败")
+	}
 
 	_, err = gcache.Remove(ctx, model.CACHE_KEY_USER_ADDRESSES)
 	if err != nil {
@@ -93,7 +96,7 @@ func (b *binanceService) ApplyWithdraw(ctx context.Context, in *define.ApplyWith
 		ExternalOrderId: in.ExternalOrderId,
 		ExternalUserId:  in.ExternalUserId,
 		Symbol:          in.Symbol,
-		Value:           valueWei.String(),
+		Value:           valueWei,
 		To:              in.To,
 		UserId:          idVar.Int(),
 		UserAddress:     in.UserAddress,
