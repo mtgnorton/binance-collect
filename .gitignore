@@ -25,3 +25,4 @@ test/
 /app/system/admin/TestConfig_Set_in_gf_admin_app_system_admin_internal_service__1_.test
 /go_test_gf_admin_app_system_admin_internal_service.test
 public/1front
+docker-runtime

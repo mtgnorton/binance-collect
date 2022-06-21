@@ -1,0 +1,43 @@
+version: '3'
+
+networks:
+  gf-admin-network:
+services:
+  db:
+    build:
+      context: ./dockerfiles
+      dockerfile: mysql.dockerfile
+    restart: unless-stopped
+    container_name: mysql-gf-admin
+    tty: true
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: binance_collect
+      MYSQL_USER: binance_collect
+      MYSQL_PASSWORD: eyt83iyEE8satpYm
+      MYSQL_ROOT_PASSWORD: eyt83iyEE8satpYm
+    volumes:
+      - ./docker-runtime/mysql:/var/lib/mysql
+    networks:
+      - gf-admin-network
+
+  web:
+    build:
+      context: ./dockerfiles
+      dockerfile: go.dockerfile
+
+    container_name: web
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    volumes:
+      - ./docker-runtime/logs:/go/src/runtime
+      - ./dockerfiles/config-prod.toml:/go/src/config/config-prod.toml
+      - ./dockerfiles/casbin_model.conf:/go/src/config/casbin_model.conf
+    command: sh -c './wait-for db:3306 -- ./binance-collect'
+    networks:
+      - gf-admin-network
+    depends_on:
+      - db
+

@@ -1,0 +1,91 @@
+# HTTP Server
+[server]
+Address     = ":8200"
+ServerAgent = "gf-admin"
+LogPath     = "runtime/server"
+LogStdout = false #已经通过自身实现输出相关日志
+sessionPath =  "temp/sessions"    # Session文件存储目录
+openapiPath =  "/api.json"
+swaggerPath =  "/swagger"
+prefix      =  "/admin-api"
+
+ServerRoot  = "public"
+#indexFiles          = ["index.html","index.htm"]   # 自动首页静态文件检索。默认为["index.html", "index.htm"]
+indexFolder         = false                        # 当访问静态文件目录时，是否展示目录下的文件列表。默认关闭，那么请求将返回403
+#	searchPaths         = ["/home/www","/var/lib/www"] # 提供静态文件服务时额外的文件搜索路径，当根路径找不到时则按照顺序在搜索目录查找。默认关闭
+fileServerEnabled   = true                        # 静态文件服务总开关。默认false
+
+[binance]
+Port = "8201"
+
+[upload]
+path        = "upload"
+# Logger.
+[logger]
+Path        = "runtime/gf-admin"
+Level       = "all"
+Stdout      = false
+[logger.default]
+path = "runtime/gf-admin"
+level = "all"
+#    stdout = true
+[logger.token]
+path = "runtime/token"
+level = "all"
+stdout = true
+[logger.auth]
+path = "runtime/auth"
+level = "all"
+stdout = true
+[logger.ws]
+path = "runtime/ws"
+level = "all"
+stdout = true
+[logger.deposit_withdraw]
+path = "runtime/deposit_withdraw"
+level = "all"
+stdout = true
+# Database.
+[database]
+link  = "mysql:root:eyt83iyEE8satpYm@tcp(mysql-gf-admin:3306)/binance_collect"
+debug = true
+# Database logger.
+[database.logger]
+Path   = "runtime/sql"
+Level  = "all"
+Stdout = true
+
+[token]
+CacheMode = "cache" #cache是使用默认缓存，redis使用redis
+CacheKey  = "administrator_token_"
+Timeout =  0  #token过期时间，单位为毫秒，默认10天
+MaxRefresh = 0 #token刷新时间，单位为毫秒，默认为timeout
+# 的一半
+EncryptKey = "noworldcanexpressmywholehearted1" #aes加密key,key的长度必须是16/24/32位
+MultiLogin = true #是否支持多点登录，默认false
+[casbin]
+driverName = "mysql"
+dataSourceName = "root:eyt83iyEE8satpYm@tcp(mysql-gf-admin:3306)/binance_collect"
+tableName = "ga_casbin_rule"
+ignoreUrls = ["/administrator-get-logged-info","/routes","/logout"]
+# Redis数据库配置
+[redis]
+[redis.default]
+host = "127.0.0.1"
+port = "6379"
+db = 2
+[redis.session]
+host = "127.0.0.1"
+port = "6379"
+db = 3
+
+
+[[gfcli.gen.dao]]
+link     = "mysql:root:secret@tcp(127.0.0.1:3306)/binance"
+removePrefix = "ga_"
+overwriteDao = true
+modelFile = "all.go"
+jsonCase = "snake"
+path="./app"
+
+
