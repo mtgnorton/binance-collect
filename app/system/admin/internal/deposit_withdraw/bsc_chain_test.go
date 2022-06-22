@@ -152,6 +152,12 @@ func TestBscChain_WeiToEther(t *testing.T) {
 		t.AssertNil(err)
 		fmt.Println(ether)
 	})
+	gtest.C(t, func(t *gtest.T) {
+		wei := "1e+16"
+		ether, err := TestClient.WeiToEther(ctx, wei, model.CONTRACT_DEFAULT_SYMBOL)
+		t.AssertNil(err)
+		fmt.Println(ether)
+	})
 }
 
 func TestBscChain_EtherToWei(t *testing.T) {

@@ -54,6 +54,29 @@ type CollectListOutput struct {
 	Total int                `json:"total"`
 }
 
+type CollectUpdateReq struct {
+	g.Meta `path:"/binance-collect-update" method:"put" summary:"归集更新" tags:"币安后台接口"`
+	*CollectUpdateInput
+}
+type CollectUpdateRes struct {
+}
+
+type CollectUpdateInput struct {
+	Id     int    `json:"id"`
+	Status string `json:"status"`
+}
+
+type CollectDestroyReq struct {
+	g.Meta `path:"/binance-collect-destroy" method:"delete" summary:"归集删除" tags:"币安后台接口"`
+	*CollectDestroyInput
+}
+type CollectDestroyRes struct {
+}
+
+type CollectDestroyInput struct {
+	Id int `json:"id"`
+}
+
 type WithdrawListReq struct {
 	g.Meta `path:"/binance-withdraw-list" method:"get" summary:"提现列表" tags:"币安后台接口"`
 	*WithdrawListInput
@@ -77,6 +100,28 @@ type WithdrawListOutput struct {
 	Page  int                 `json:"page"`
 	Size  int                 `json:"size"`
 	Total int                 `json:"total"`
+}
+
+type WithdrawUpdateReq struct {
+	g.Meta `path:"/binance-withdraw-update" method:"put" summary:"提现更新" tags:"币安后台接口"`
+	*WithdrawUpdateInput
+}
+type WithdrawUpdateRes struct {
+}
+type WithdrawUpdateInput struct {
+	Id     int    `json:"id"`
+	Status string `json:"status"`
+}
+
+type WithdrawDestroyReq struct {
+	g.Meta `path:"/binance-withdraw-destroy" method:"delete" summary:"提现删除" tags:"币安后台接口"`
+	*WithdrawDestroyInput
+}
+
+type WithdrawDestroyRes struct {
+}
+type WithdrawDestroyInput struct {
+	Id int `json:"id"`
 }
 
 type QueueTaskListReq struct {
@@ -103,6 +148,29 @@ type QueueTaskListOutput struct {
 	Total int                      `json:"total"`
 }
 
+type QueueTaskUpdateReq struct {
+	g.Meta `path:"/binance-queue-task-update" method:"put" summary:"队列任务更新" tags:"币安后台接口"`
+	*QueueTaskUpdateInput
+}
+type QueueTaskUpdateRes struct {
+}
+type QueueTaskUpdateInput struct {
+	Id         int    `dc:"队列任务id" json:"id"`
+	Status     string `dc:"状态" json:"status"`
+	FailAmount int    `dc:"失败次数" json:"fail_amount"`
+}
+
+type QueueTaskDestroyReq struct {
+	g.Meta `path:"/binance-queue-task-destroy" method:"delete" summary:"队列任务删除" tags:"币安后台接口"`
+	*QueueTaskDestroyInput
+}
+type QueueTaskDestroyRes struct {
+}
+
+type QueueTaskDestroyInput struct {
+	Id int `dc:"队列任务id" json:"id"`
+}
+
 type NotifyListReq struct {
 	g.Meta `path:"/binance-notify-list" method:"get" summary:"通知列表" tags:"币安后台接口"`
 	*NotifyListInput
@@ -122,6 +190,28 @@ type NotifyListOutput struct {
 type NotifyListInput struct {
 	UniqueId string `dc:"唯一id查询" json:"unique_id"`
 	model.PageSizeInput
+}
+
+type NotifyUpdateReq struct {
+	g.Meta `path:"/binance-notify-update" method:"put" summary:"通知更新" tags:"币安后台接口"`
+	*NotifyUpdateInput
+}
+type NotifyUpdateRes struct {
+}
+type NotifyUpdateInput struct {
+	Id                 int    `dc:"通知id" json:"id"`
+	Status             string `dc:"状态" json:"status"`
+	IsImmediatelyRetry bool   `dc:"是否立即重试" json:"is_immediately_retry"`
+}
+
+type NotifyDestroyReq struct {
+	g.Meta `path:"/binance-notify-destroy" method:"delete" summary:"通知删除" tags:"币安后台接口"`
+	*NotifyDestroyInput
+}
+type NotifyDestroyRes struct {
+}
+type NotifyDestroyInput struct {
+	Id int `dc:"通知id" json:"id"`
 }
 
 type ContractListReq struct {

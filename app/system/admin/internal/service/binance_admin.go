@@ -6,7 +6,10 @@ import (
 	"gf-admin/app/dao"
 	"gf-admin/app/model"
 	"gf-admin/app/system/admin/internal/define"
+	"gf-admin/app/system/admin/internal/deposit_withdraw"
 	"gf-admin/utility/custom_error"
+
+	"github.com/gogf/gf/v2/container/garray"
 
 	"github.com/gogf/gf/v2/os/gcache"
 
@@ -77,7 +80,54 @@ func (ba *binanceAdmin) CollectList(ctx context.Context, in *define.CollectListI
 	}
 	d = d.Order(dao.Collects.Columns().Id, "desc").Page(in.Page, in.Size)
 	err = d.Scan(&out.List)
+	for _, item := range out.List {
+		item.Value, err = deposit_withdraw.ChainClient.WeiToEther(ctx, item.Value, item.Symbol)
+		if err != nil {
+			return out, custom_error.New(err.Error(), g.Map{
+				"item": item,
+			})
+		}
+		item.RechargeValue, err = deposit_withdraw.ChainClient.WeiToEther(ctx, item.RechargeValue, item.Symbol)
+		if err != nil {
+			return out, custom_error.New(err.Error(), g.Map{
+				"item": item,
+			})
+		}
+	}
 	return
+}
+func (ba *binanceAdmin) CollectUpdate(ctx context.Context, in *define.CollectUpdateInput) (err error) {
+	d := dao.Collects.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Collects.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Collects.Columns().Id)
+
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Update(g.Map{
+		dao.Collects.Columns().Status: in.Status,
+	})
+
+	return
+
+}
+
+func (ba *binanceAdmin) CollectDestroy(ctx context.Context, in *define.CollectDestroyInput) (err error) {
+	d := dao.Collects.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Collects.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Collects.Columns().Id)
+
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+
+	_, err = d.Delete()
+
+	return err
 }
 
 func (ba *binanceAdmin) WithdrawList(ctx context.Context, in *define.WithdrawListInput) (out *define.WithdrawListOutput, err error) {
@@ -114,6 +164,41 @@ func (ba *binanceAdmin) WithdrawList(ctx context.Context, in *define.WithdrawLis
 	}
 	d = d.Order(dao.Withdraws.Columns().Id, "desc").Page(in.Page, in.Size)
 	err = d.Scan(&out.List)
+	for _, item := range out.List {
+		item.Value, err = deposit_withdraw.ChainClient.WeiToEther(ctx, item.Value, item.Symbol)
+		if err != nil {
+			return out, custom_error.New(err.Error())
+		}
+	}
+	return
+}
+
+func (ba *binanceAdmin) WithdrawUpdate(ctx context.Context, in *define.WithdrawUpdateInput) (err error) {
+	d := dao.Withdraws.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Withdraws.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Withdraws.Columns().Id)
+
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Update(g.Map{
+		dao.Withdraws.Columns().Status: in.Status,
+	})
+	return
+}
+func (ba *binanceAdmin) WithdrawDestroy(ctx context.Context, in *define.WithdrawDestroyInput) (err error) {
+	d := dao.Withdraws.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Withdraws.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Withdraws.Columns().Id)
+
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Delete()
 	return
 }
 
@@ -151,7 +236,49 @@ func (ba *binanceAdmin) QueueTaskList(ctx context.Context, in *define.QueueTaskL
 		Where(dao.QueueTaskLog.Columns().QueueTaskId, gdb.ListItemValuesUnique(out.List, "Task", "Id")).
 		ScanList(&out.List, "Logs", "Task", "queue_task_id:Id")
 
+	for _, item := range out.List {
+		item.Task.Value, err = deposit_withdraw.ChainClient.WeiToEther(ctx, item.Task.Value, item.Task.Symbol)
+		if err != nil {
+			return out, custom_error.New(err.Error())
+		}
+	}
 	return
+}
+
+func (ba *binanceAdmin) QueueTaskUpdate(ctx context.Context, in *define.QueueTaskUpdateInput) (err error) {
+	d := dao.QueueTask.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.QueueTask.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.QueueTask.Columns().Id)
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	statusArray := garray.NewStrArrayFrom([]string{model.QUEUE_TASK_STATUS_WAIT, model.QUEUE_TASK_STATUS_PROCESS, model.QUEUE_TASK_STATUS_SUCCESS, model.QUEUE_TASK_STATUS_FAIL})
+	if !statusArray.Contains(in.Status) {
+		return custom_error.New("status is not exist")
+	}
+
+	_, err = d.Update(g.Map{
+		dao.QueueTask.Columns().Status:     in.Status,
+		dao.QueueTask.Columns().FailAmount: in.FailAmount,
+	})
+
+	return err
+
+}
+
+func (ba *binanceAdmin) QueueTaskDestroy(ctx context.Context, in *define.QueueTaskDestroyInput) (err error) {
+	d := dao.QueueTask.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.QueueTask.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.QueueTask.Columns().Id)
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Delete()
+	return err
 }
 
 func (ba *binanceAdmin) NotifyList(ctx context.Context, in *define.NotifyListInput) (out *define.NotifyListOutput, err error) {
@@ -177,6 +304,34 @@ func (ba *binanceAdmin) NotifyList(ctx context.Context, in *define.NotifyListInp
 		Where(dao.NotifyLog.Columns().NotifyId, gdb.ListItemValuesUnique(out.List, "Notify", "Id")).
 		ScanList(&out.List, "Logs", "Notify", "notify_id:Id")
 
+	return
+}
+func (ba *binanceAdmin) NotifyUpdate(ctx context.Context, in *define.NotifyUpdateInput) (err error) {
+	d := dao.Notify.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Notify.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Notify.Columns().Id)
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Update(g.Map{
+		dao.Notify.Columns().Status:             in.Status,
+		dao.Notify.Columns().IsImmediatelyRetry: in.IsImmediatelyRetry,
+	})
+	return
+}
+
+func (ba *binanceAdmin) NotifyDestroy(ctx context.Context, in *define.NotifyDestroyInput) (err error) {
+	d := dao.Notify.Ctx(ctx)
+	if in.Id != 0 {
+		d = d.Where(dao.Notify.Columns().Id, in.Id)
+	}
+	idVar, err := d.Value(dao.Notify.Columns().Id)
+	if idVar.Int() == 0 {
+		return custom_error.New("id is not exist")
+	}
+	_, err = d.Delete()
 	return
 }
 

@@ -22,10 +22,31 @@ func (ua *binanceAdmin) CollectList(ctx context.Context, req *define.CollectList
 	res.CollectListOutput, err = service.BinanceAdmin.CollectList(ctx, req.CollectListInput)
 	return
 }
+func (ua *binanceAdmin) CollectUpdate(ctx context.Context, req *define.CollectUpdateReq) (res *define.CollectUpdateRes, err error) {
+	res = new(define.CollectUpdateRes)
+	err = service.BinanceAdmin.CollectUpdate(ctx, req.CollectUpdateInput)
+	return
+}
+
+func (ua *binanceAdmin) CollectDestroy(ctx context.Context, req *define.CollectDestroyReq) (res *define.CollectDestroyRes, err error) {
+	res = new(define.CollectDestroyRes)
+	err = service.BinanceAdmin.CollectDestroy(ctx, req.CollectDestroyInput)
+	return
+}
 
 func (ua *binanceAdmin) WithdrawList(ctx context.Context, req *define.WithdrawListReq) (res *define.WithdrawListRes, err error) {
 	res = new(define.WithdrawListRes)
 	res.WithdrawListOutput, err = service.BinanceAdmin.WithdrawList(ctx, req.WithdrawListInput)
+	return
+}
+func (ba *binanceAdmin) WithdrawUpdate(ctx context.Context, req *define.WithdrawUpdateReq) (res *define.WithdrawUpdateRes, err error) {
+	res = new(define.WithdrawUpdateRes)
+	err = service.BinanceAdmin.WithdrawUpdate(ctx, req.WithdrawUpdateInput)
+	return
+}
+func (ba *binanceAdmin) WithdrawDestroy(ctx context.Context, req *define.WithdrawDestroyReq) (res *define.WithdrawDestroyRes, err error) {
+	res = new(define.WithdrawDestroyRes)
+	err = service.BinanceAdmin.WithdrawDestroy(ctx, req.WithdrawDestroyInput)
 	return
 }
 
@@ -34,10 +55,33 @@ func (ua *binanceAdmin) QueueTaskList(ctx context.Context, req *define.QueueTask
 	res.QueueTaskListOutput, err = service.BinanceAdmin.QueueTaskList(ctx, req.QueueTaskListInput)
 	return
 }
+func (ua *binanceAdmin) QueueTaskUpdate(ctx context.Context, req *define.QueueTaskUpdateReq) (res *define.QueueTaskUpdateRes, err error) {
+	res = new(define.QueueTaskUpdateRes)
+	err = service.BinanceAdmin.QueueTaskUpdate(ctx, req.QueueTaskUpdateInput)
+	return
+}
+
+func (ua *binanceAdmin) QueueTaskDestroy(ctx context.Context, req *define.QueueTaskDestroyReq) (res *define.QueueTaskDestroyRes, err error) {
+	res = new(define.QueueTaskDestroyRes)
+	err = service.BinanceAdmin.QueueTaskDestroy(ctx, req.QueueTaskDestroyInput)
+	return
+}
 
 func (ua *binanceAdmin) NotifyList(ctx context.Context, req *define.NotifyListReq) (res *define.NotifyListRes, err error) {
 	res = new(define.NotifyListRes)
 	res.NotifyListOutput, err = service.BinanceAdmin.NotifyList(ctx, req.NotifyListInput)
+	return
+}
+
+func (ba *binanceAdmin) NotifyUpdate(ctx context.Context, req *define.NotifyUpdateReq) (res *define.NotifyUpdateRes, err error) {
+	res = new(define.NotifyUpdateRes)
+	err = service.BinanceAdmin.NotifyUpdate(ctx, req.NotifyUpdateInput)
+	return
+}
+
+func (ba *binanceAdmin) NotifyDestroy(ctx context.Context, req *define.NotifyDestroyReq) (res *define.NotifyDestroyRes, err error) {
+	res = new(define.NotifyDestroyRes)
+	err = service.BinanceAdmin.NotifyDestroy(ctx, req.NotifyDestroyInput)
 	return
 }
 

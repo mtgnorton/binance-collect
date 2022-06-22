@@ -149,13 +149,29 @@ func (b *BscChain) GetMinCollectValue(ctx context.Context) (*big.Int, error) {
 }
 
 func (b *BscChain) WeiToEther(ctx context.Context, value string, symbol string) (string, error) {
-	valueBigFloat, ok := big.NewFloat(0).SetString(value)
-	if !ok {
-		return "", custom_error.New("value string to big.float error", g.Map{
-			"value":  value,
-			"symbol": symbol,
-		})
+	if value == "" {
+		return "0", nil
 	}
+
+	var valueBigFloat *big.Float
+	var err error
+	// 科学记数法转为10进制
+	if gstr.Contains(value, "e") {
+		valueBigFloat, _, err = big.ParseFloat(value, 10, 0, big.ToNearestEven)
+		if err != nil {
+			return "", custom_error.New(err.Error())
+		}
+	} else {
+		var ok bool
+		valueBigFloat, ok = big.NewFloat(0).SetString(value)
+		if !ok {
+			return "", custom_error.New("value string to big.float error", g.Map{
+				"value":  value,
+				"symbol": symbol,
+			})
+		}
+	}
+
 	contracts, err := b.GetContracts(ctx)
 	if err != nil {
 		return "", err
@@ -177,13 +193,14 @@ func (b *BscChain) WeiToEther(ctx context.Context, value string, symbol string) 
 
 	decimalBigFloat := big.NewFloat(math.Pow(10, float64(decimal)))
 
-	g.Dump(decimalBigFloat.String(), valueBigFloat.String())
-
 	valueBigFloat = valueBigFloat.Quo(valueBigFloat, decimalBigFloat)
 	return valueBigFloat.String(), nil
 }
 
 func (b *BscChain) EtherToWei(ctx context.Context, value string, symbol string) (string, error) {
+	if value == "" {
+		return "0", nil
+	}
 	valueBigFloat, ok := big.NewFloat(0).SetString(value)
 	if !ok {
 		return "", custom_error.New("value string to big.float error", g.Map{
