@@ -10,6 +10,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/gogf/gf/v2/os/gtime"
+
 	"github.com/gogf/gf/v2/util/grand"
 
 	"github.com/gogf/gf/v2/util/gconv"
@@ -329,18 +331,29 @@ func (ts *TransactionScanner) scanTxCollect(ctx context.Context) ([]*TransferTas
 	return tasks, nil
 }
 
-// 检测失败的队列任务进行重试，失败次数需要小于5次，并且失败时间超过3min
+// 检测失败的队列任务进行重试，失败次数需要小于5次，并且失败时间超过2min
 
 //todo  如果队列任务的状态为process,并且超过一定时间，说明区块检测的时候该交易没有检测到，需要重新检测
 func (ts *TransactionScanner) scanFailTxTransferTask(ctx context.Context) ([]*TransferTask, error) {
-	tasks := make([]*TransferTask, 0)
-	err := dao.QueueTask.Ctx(ctx).
-		WhereLT(dao.QueueTask.Columns().UpdateAt, time.Now().Add(-3*time.Minute)).
-		Where(dao.QueueTask.Columns().Status, model.QUEUE_TASK_STATUS_FAIL).
-		Scan(&tasks)
+	//tasks := make([]*TransferTask, 0)
+	var tasks []*TransferTask
+	d := dao.QueueTask.Ctx(ctx).
+		WhereLT(dao.QueueTask.Columns().UpdateAt, gtime.Now().Add(-2*time.Minute)).
+		WhereLT(dao.QueueTask.Columns().FailAmount, model.QUEUE_FAIL_MAX_TRY_AMOUNT).
+		Where(dao.QueueTask.Columns().Status, model.QUEUE_TASK_STATUS_FAIL)
+	err := d.Scan(&tasks)
+
 	if err != nil {
 		return tasks, err
 	}
+	LogInfofDw(ctx, "scanFailTxTransferTask begin,tx length: %d", len(tasks))
+
+	if len(tasks) > 0 {
+		_, err = d.Update(g.Map{
+			dao.QueueTask.Columns().Status: model.QUEUE_TASK_STATUS_WAIT,
+		})
+	}
+
 	return tasks, nil
 }
 

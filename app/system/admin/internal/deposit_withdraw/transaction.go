@@ -38,8 +38,8 @@ func NewTransaction(ctx context.Context, origin *OriginTransaction) (*Transactio
 	t := &Transaction{
 		Hash:        origin.Hash,
 		Nonce:       origin.Nonce,
-		From:        origin.From,
-		To:          origin.To,
+		From:        gstr.ToLower(origin.From),
+		To:          gstr.ToLower(origin.To),
 		Value:       origin.Value,
 		GasUsed:     origin.Gas,
 		GasPrice:    origin.GasPrice,
@@ -59,7 +59,7 @@ func NewTransaction(ctx context.Context, origin *OriginTransaction) (*Transactio
 		}
 		var contract entity.Contracts
 		var ok bool
-		if contract, ok = contracts[gstr.ToLower(origin.To)]; !ok {
+		if contract, ok = contracts[origin.To]; !ok {
 			return t, nil
 		}
 

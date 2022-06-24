@@ -429,8 +429,8 @@ CREATE TABLE `notify` (
   `fail_amount` int(11) NOT NULL DEFAULT 0 COMMENT '失败次数',
   `status` varchar(20) NOT NULL DEFAULT '' COMMENT '状态 fail 失败,wait等待通知  finish通知完成',
   `is_immediately_retry` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否立即重试',
-  `create_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT '创建时间',
-  `notify_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT '上次通知时间',
+  `create_at` timestamp  DEFAULT null current_timestamp() COMMENT '创建时间',
+  `notify_at` timestamp  DEFAULT null current_timestamp() COMMENT '上次通知时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='通知表';
 

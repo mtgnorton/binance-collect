@@ -106,7 +106,7 @@ func (b *BscChain) GetFeeWithdrawAddress(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", custom_error.New(err.Error())
 	}
-	return feeWithdrawAddress, nil
+	return gstr.ToLower(feeWithdrawAddress), nil
 }
 
 // 获取手续费提现私钥
@@ -126,7 +126,7 @@ func (b *BscChain) GetCollectAddress(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", custom_error.New(err.Error())
 	}
-	return collectAddress, nil
+	return gstr.ToLower(collectAddress), nil
 }
 
 //  获取最小充值金额

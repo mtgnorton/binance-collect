@@ -100,6 +100,7 @@ func (b *binanceService) ApplyWithdraw(ctx context.Context, in *define.ApplyWith
 		To:              in.To,
 		UserId:          idVar.Int(),
 		UserAddress:     in.UserAddress,
+		ContractAddress: contract.Address,
 		Status:          model.WITHDRAW_STATUS_WAIT,
 	})
 

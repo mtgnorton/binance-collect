@@ -166,11 +166,11 @@ func (tp *TransactionSimpleProcessor) HandleWithdraw(ctx context.Context, transa
 
 		// 判断hash是否重复处理
 		idVar, err := dao.Withdraws.Ctx(ctx).
-			Where(dao.Collects.Columns().HandfeeHash, transaction.Hash).
-			Where(dao.Collects.Columns().Status, g.Slice{
+			Where(dao.Withdraws.Columns().Hash, transaction.Hash).
+			Where(dao.Withdraws.Columns().Status, g.Slice{
 				model.WITHDRAW_STATUS_WAIT_NOTIFY, model.WITHDRAW_STATUS_PROCESS_NOTIFY, model.WITHDRAW_STATUS_FINISH_NOTIFY,
 			}).
-			Value(dao.Collects.Columns().Id)
+			Value(dao.Withdraws.Columns().Id)
 		if idVar.Int() > 0 {
 			return custom_error.New("withdraw hash has handle", g.Map{
 				"transaction": transaction,

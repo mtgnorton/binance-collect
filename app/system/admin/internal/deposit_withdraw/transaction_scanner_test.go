@@ -90,3 +90,13 @@ func TestTransactionScanner_scanFailNotify(t *testing.T) {
 		g.Dump(*tasks[0])
 	})
 }
+func TestTransactionScanner_scanFailTxTransferTask(t *testing.T) {
+
+	gtest.C(t, func(t *gtest.T) {
+		scanner := NewTransactionScanner(ctx, 5)
+		tasks, err := scanner.scanFailTxTransferTask(ctx)
+		t.AssertNil(err)
+		t.AssertGT(len(tasks), 0)
+		g.Dump(*tasks[0])
+	})
+}
