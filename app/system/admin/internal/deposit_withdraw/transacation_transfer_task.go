@@ -55,6 +55,27 @@ func (task *TransferTask) MarkFail(ctx context.Context, recordErr error, isNotTr
 			FailAmount:  oldFailAmount.Int() + 1,
 		})
 
+		if err != nil {
+			return err
+		}
+
+		// 将任务对应的归集或提现记录标记为失败
+		//switch task.Type {
+		//case model.TRANSACTION_TYPE_COLLECT, model.TRANSACTION_TYPE_FEE:
+		//	_, err = dao.Collects.Ctx(ctx).Update(g.Map{
+		//		dao.Collects.Columns().Status: model.COLLECT_STATUS_FAIL,
+		//	}, g.Map{
+		//		dao.Collects.Columns().Id: task.RelationId,
+		//	})
+		//
+		//case model.TRANSACTION_TYPE_WITHDRAW:
+		//	_, err = dao.Withdraws.Ctx(ctx).Update(g.Map{
+		//		dao.Withdraws.Columns().Status: model.WITHDRAW_STATUS_FAIL,
+		//	}, g.Map{
+		//		dao.Withdraws.Columns().Id: task.RelationId,
+		//	})
+		//}
+
 		return err
 	})
 	if err != nil {
@@ -64,7 +85,9 @@ func (task *TransferTask) MarkFail(ctx context.Context, recordErr error, isNotTr
 	}
 }
 
-func (task *TransferTask) SendAfterFunc(ctx context.Context) error {
+// SendAfterSuccess 发送交易成功后执行的方法
+
+func (task *TransferTask) SendAfterSuccess(ctx context.Context) error {
 	switch task.Type {
 	// 将转出手续费的hash更新到collects表
 	case model.TRANSACTION_TYPE_FEE:

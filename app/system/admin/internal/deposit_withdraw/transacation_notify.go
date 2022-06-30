@@ -69,10 +69,10 @@ func (tn *TransactionNotifier) Consume(ctx context.Context, task *NotifyTask) {
 		}))
 		return
 	}
-	err = task.SendAfterFunc(ctx)
+	err = task.SendAfterSuccess(ctx)
 
 	if err != nil {
-		LogErrorfDw(ctx, custom_error.Wrap(err, "notify SendAfterFunc", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "notify SendAfterSuccess", g.Map{
 			"task": *task,
 		}))
 		return

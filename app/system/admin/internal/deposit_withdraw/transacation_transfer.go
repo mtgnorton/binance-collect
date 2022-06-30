@@ -135,10 +135,10 @@ func (qc *TransactionTransfer) Consume(ctx context.Context, task *TransferTask) 
 		}))
 		return
 	}
-	err = task.SendAfterFunc(ctx)
+	err = task.SendAfterSuccess(ctx)
 
 	if err != nil {
-		LogErrorfDw(ctx, custom_error.Wrap(err, "transfer SendAfterFunc", g.Map{
+		LogErrorfDw(ctx, custom_error.Wrap(err, "transfer SendAfterSuccess", g.Map{
 			"task": *task,
 		}))
 		return

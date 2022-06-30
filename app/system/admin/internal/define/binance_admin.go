@@ -201,7 +201,7 @@ type NotifyUpdateRes struct {
 type NotifyUpdateInput struct {
 	Id                 int    `dc:"通知id" json:"id"`
 	Status             string `dc:"状态" json:"status"`
-	IsImmediatelyRetry bool   `dc:"是否立即重试" json:"is_immediately_retry"`
+	IsImmediatelyRetry int    `dc:"是否立即重试" json:"is_immediately_retry"`
 }
 
 type NotifyDestroyReq struct {

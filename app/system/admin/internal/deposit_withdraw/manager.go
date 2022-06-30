@@ -3,7 +3,10 @@ package deposit_withdraw
 import (
 	"context"
 	"gf-admin/app/model"
+	"gf-admin/app/shared"
 	"time"
+
+	"github.com/gogf/gf/v2/frame/g"
 
 	"github.com/gogf/gf/v2/os/gtimer"
 )
@@ -108,6 +111,14 @@ func (m *Manager) Detect(ctx context.Context) (*OriginBlock, error) {
 		return nil, err
 	}
 	blockInfo, err := ChainClient.GetBlockInfoByNumber(ctx, detectNumber)
-
+	shared.WsService.Broadcast(&shared.WsMessage{
+		Type: shared.WsMessageTypeBinance,
+		Data: g.Map{
+			"blockInfo": g.Map{
+				"latest": newestNumber,
+				"detect": detectNumber,
+			},
+		},
+	})
 	return blockInfo, err
 }

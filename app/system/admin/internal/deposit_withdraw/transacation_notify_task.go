@@ -85,7 +85,7 @@ func (task *NotifyTask) MarkFail(ctx context.Context, recordErr error) {
 	}
 }
 
-func (task *NotifyTask) SendAfterFunc(ctx context.Context) error {
+func (task *NotifyTask) SendAfterSuccess(ctx context.Context) error {
 
 	switch task.Type {
 	case model.NOTIFY_TYPE_RECHARGE:

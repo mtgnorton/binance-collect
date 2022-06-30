@@ -7,12 +7,13 @@ import (
 	"gf-admin/app/system/admin/internal/service"
 	"gf-admin/utility"
 	"gf-admin/utility/custom_log"
+	"time"
+
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/os/gtimer"
-	"time"
 )
 
 var Ws = ws{}
@@ -29,12 +30,12 @@ func (w *ws) Ws(r *ghttp.Request) {
 	}
 
 	userAgent := r.Header.Get("User-Agent")
-	wsUser := service.NewWsUser(ws, userAgent)
+	wsUser := shared.NewWsUser(ws, userAgent)
 
 	var administrator *model.AdministratorSummary
 
 	if administrator, err = w.auth(r); err != nil {
-		wsUser.Write(&service.WsMessage{
+		wsUser.Write(&shared.WsMessage{
 			Type:    "error",
 			Message: err.Error(),
 		})
@@ -42,7 +43,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 		r.Exit()
 	}
 	wsUser.SetUserId(administrator.Id)
-	service.WsService.AddUser(wsUser)
+	shared.WsService.AddUser(wsUser)
 
 	for {
 		_, msg, err := ws.ReadMessage()
@@ -50,13 +51,13 @@ func (w *ws) Ws(r *ghttp.Request) {
 			custom_log.Log(r, err)
 			return
 		}
-		wm, err := service.TransferWsMessage(msg)
+		wm, err := shared.TransferWsMessage(msg)
 
 		wsUser.UpdateLastSendTime()
 
-		if wm.Type == service.WsMessageTypeHeart {
-			wsUser.Write(&service.WsMessage{
-				Type: service.WsMessageTypeHeart,
+		if wm.Type == shared.WsMessageTypeHeart {
+			wsUser.Write(&shared.WsMessage{
+				Type: shared.WsMessageTypeHeart,
 				Data: g.Map{
 					"pong": gtime.Timestamp(),
 				},
@@ -65,7 +66,7 @@ func (w *ws) Ws(r *ghttp.Request) {
 		}
 
 		if err != nil {
-			wsUser.Write(&service.WsMessage{
+			wsUser.Write(&shared.WsMessage{
 				Type:    "error",
 				Message: err.Error(),
 			})
@@ -105,7 +106,7 @@ func (w *ws) auth(r *ghttp.Request) (administrator *model.AdministratorSummary, 
 func (ws *ws) MonitorSystem(ctx context.Context) {
 	gtimer.AddSingleton(ctx, 1*time.Second, func(ctx context.Context) {
 
-		connAmount := service.WsService.ConnCount()
+		connAmount := shared.WsService.ConnCount()
 		if connAmount > 0 {
 			memoryInfo, err := utility.GetMemoryInfo()
 			if err != nil {
@@ -116,12 +117,12 @@ func (ws *ws) MonitorSystem(ctx context.Context) {
 				return
 			}
 
-			service.WsService.Broadcast(&service.WsMessage{
-				Type: service.WsMessageTypeSystem,
+			shared.WsService.Broadcast(&shared.WsMessage{
+				Type: shared.WsMessageTypeSystem,
 				Data: g.Map{
 					"cpu":                 cpuInfo,
 					"memory":              memoryInfo,
-					"administratorAmount": service.WsService.UserCount(),
+					"administratorAmount": shared.WsService.UserCount(),
 				},
 			})
 		}
