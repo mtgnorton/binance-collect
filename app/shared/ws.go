@@ -1,8 +1,12 @@
-package service
+package shared
 
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -10,9 +14,6 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/os/gtimer"
 	"github.com/gogf/gf/v2/util/gconv"
-	"sync"
-	"sync/atomic"
-	"time"
 )
 
 var WsService = wsService{
@@ -242,10 +243,11 @@ func (user *wsUser) Clear() {
 }
 
 const (
-	WsMessageTypeHeart  = "heart"
-	WsMessageTypeSystem = "system"
-	WsMessageTypeError  = "error"
-	WsMessageTypeDebug  = "debug"
+	WsMessageTypeHeart   = "heart"
+	WsMessageTypeSystem  = "system"
+	WsMessageTypeBinance = "binance"
+	WsMessageTypeError   = "error"
+	WsMessageTypeDebug   = "debug"
 )
 
 //接受和发送的消息格式

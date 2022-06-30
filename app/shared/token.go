@@ -274,7 +274,6 @@ func (t *TokenHandler) decrypt(ctx context.Context, token string) (tf TokenFrame
 	}
 	token = strings.Replace(token, "-", "+", -1)
 	token = strings.Replace(token, "_", "/", -1)
-	token = ""
 	tokenBase64, err := gbase64.Decode([]byte(token))
 
 	if err != nil {

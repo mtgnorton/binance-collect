@@ -1,16 +1,17 @@
-package service
+package shared
 
 import (
 	"context"
 	"fmt"
-	"github.com/gogf/gf/container/garray"
-	"github.com/gogf/gf/v2/os/gctx"
-	"github.com/gogf/gf/v2/os/gtimer"
-	"github.com/gogf/gf/v2/util/grand"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/gogf/gf/container/garray"
+	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gtimer"
+	"github.com/gogf/gf/v2/util/grand"
 )
 
 // 并发下创建和移除连接

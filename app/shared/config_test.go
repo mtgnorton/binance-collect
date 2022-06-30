@@ -2,9 +2,10 @@ package shared
 
 import (
 	"context"
+	"testing"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var ctx = context.TODO()
@@ -41,6 +42,7 @@ func TestConfig_Set(t *testing.T) {
 		},
 		g.Map{"k7": "v7"},
 	})
+	assert.Nil(t, err)
 }
 
 func TestConfig_Get(t *testing.T) {
