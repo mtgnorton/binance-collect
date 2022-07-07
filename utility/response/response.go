@@ -1,7 +1,9 @@
 package response
 
 import (
+	"fmt"
 	"gf-admin/utility/custom_log"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -25,11 +27,14 @@ func Json(r *ghttp.Request, code int, message string, data ...interface{}) {
 		responseData = g.Map{}
 	}
 
-	r.Response.WriteJson(JsonRes{
+	err := r.Response.WriteJson(JsonRes{
 		Code:    code,
 		Message: message,
 		Data:    responseData,
 	})
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 
@@ -59,12 +64,17 @@ func JsonRedirect(r *ghttp.Request, code int, message, redirect string, data ...
 	if len(data) > 0 {
 		responseData = data[0]
 	}
-	r.Response.WriteJson(JsonRes{
+	err := r.Response.WriteJson(JsonRes{
 		Code:     code,
 		Message:  message,
 		Data:     responseData,
 		Redirect: redirect,
 	})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 // JsonRedirectExit 返回标准JSON数据引导客户端跳转，并退出当前HTTP执行函数。
