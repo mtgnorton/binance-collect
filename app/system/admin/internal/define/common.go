@@ -11,5 +11,5 @@ type NoAuthLoginCaptchaRes struct {
 }
 type CommonGenerateCaptchaOutput struct {
 	CaptchaId     string `json:"captcha_id"`
-	CaptchaBase64 string `json:"captcha_base64""`
+	CaptchaBase64 string `json:"captcha_base64"`
 }

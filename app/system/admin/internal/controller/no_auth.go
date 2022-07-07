@@ -23,6 +23,7 @@ func (l *noAuth) Login(ctx context.Context, req *define.PersonalLoginReq) (res *
 
 	res.PersonalLoginOutput, err = service.Personal.Login(ctx, req.PersonalLoginInput)
 	return
+
 }
 
 // 图形验证码

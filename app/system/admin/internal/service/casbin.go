@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"gf-admin/app/dao"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -56,7 +57,6 @@ func (e *enforcer) Register(ctx context.Context) {
 		g.Log().Fatalf(ctx, "casbin new enforce error,error info following: %s", err)
 	}
 	err = e.instance.LoadPolicy()
-
 	if err != nil {
 		g.Log().Fatalf(ctx, "casbin load policy error,error info following: %s", err)
 	}

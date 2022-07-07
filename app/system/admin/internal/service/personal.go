@@ -7,6 +7,7 @@ import (
 	"gf-admin/app/shared"
 	"gf-admin/app/system/admin/internal/define"
 	"gf-admin/utility"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -40,11 +41,14 @@ func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInpu
 	out = &define.PersonalLoginOutput{}
 
 	isVerifyCaptcha, err := shared.Config.Get(ctx, shared.Config.BACKEND, "is_open_verify_captcha")
+	if err != nil {
+		return
+	}
 	if isVerifyCaptcha.Bool() && !Common.VerifyCaptcha(ctx, in.Code, in.CaptchaId) {
 		err = gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误")
 		return
 	}
-	g.Dump(in, 4444444)
+
 	entity, err := Administrator.GetUserByPassportAndPassword(
 		ctx,
 		in.Username,
@@ -111,18 +115,23 @@ func (p *personalService) Avatar(ctx context.Context, id uint, in *define.Person
 
 	databasePath := p.avatarSavePath(id, false) + filename
 
-	g.Dump(p.avatarSavePath(id, true), databasePath)
 	_, err = dao.Administrator.Ctx(ctx).WherePri(id).Update(g.Map{
 		dao.Administrator.Columns.Avatar: databasePath,
 	})
-
+	if err != nil {
+		return
+	}
 	updatedAdministrator, err := Administrator.GetAdministratorSummary(ctx, id)
-
-	AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
+	if err != nil {
+		return
+	}
+	err = AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
+	if err != nil {
+		return
+	}
 
 	out.AvatarUrl = databasePath
 	return
-
 }
 
 func (p *personalService) Update(ctx context.Context, administrator *model.AdministratorSummary, in *define.PersonalUpdateInput) (err error) {
@@ -155,7 +164,10 @@ func (p *personalService) Update(ctx context.Context, administrator *model.Admin
 
 	updatedAdministrator, err := Administrator.GetAdministratorSummary(ctx, administrator.Id)
 
-	AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
+	if err != nil {
+		return err
+	}
+	err = AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
 
 	return
 }

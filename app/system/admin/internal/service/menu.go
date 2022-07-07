@@ -7,6 +7,7 @@ import (
 	"gf-admin/app/model"
 	"gf-admin/app/model/entity"
 	"gf-admin/app/system/admin/internal/define"
+
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -149,7 +150,6 @@ func (m *menu) Tree(ctx context.Context, parentId uint, adminIdArgs ...uint) (tr
 		adminId uint
 	)
 	tree = make([]*model.MenuTree, 0)
-	adminId = 0
 	if len(adminIdArgs) > 0 {
 		adminId = adminIdArgs[0]
 		menus, err = m.GetByAdministratorId(ctx, adminId)
@@ -166,6 +166,9 @@ func (m *menu) Tree(ctx context.Context, parentId uint, adminIdArgs ...uint) (tr
 // 获取只包含id，name,children的菜单树
 func (m *menu) MiniTree(ctx context.Context) (miniTree []*model.MenuMiniTree, err error) {
 	tree, err := m.Tree(ctx, m.GetRootId(ctx))
+	if err != nil {
+		return miniTree, err
+	}
 	return m.miniTree(ctx, tree)
 }
 

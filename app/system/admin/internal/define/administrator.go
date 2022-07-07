@@ -3,6 +3,7 @@ package define
 import (
 	"gf-admin/app/model"
 	"gf-admin/app/model/entity"
+
 	"github.com/gogf/gf/v2/frame/g"
 )
 
@@ -35,7 +36,6 @@ type AdministratorListReq struct {
 type AdministratorListRes struct {
 	AdministratorListOutput
 }
-
 type AdministratorListInput struct {
 	Username  string `dc:"用户名查询"`
 	Status    string `dc:"状态查询" v:"in:normal,disabled#状态错误"`

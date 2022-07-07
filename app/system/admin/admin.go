@@ -6,6 +6,7 @@ import (
 	"gf-admin/app/system/admin/internal/controller"
 	"gf-admin/app/system/admin/internal/service"
 	"gf-admin/utility/response"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -110,10 +111,7 @@ func Run(ctx context.Context) {
 	controller.Ws.MonitorSystem(ctx)
 	// 启动Http Server
 	s.Run()
-	return
-
 }
-
 func sessionConfig(s *ghttp.Server) {
 
 	err := s.SetConfigWithMap(g.Map{

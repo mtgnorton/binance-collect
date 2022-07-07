@@ -45,9 +45,9 @@ type PersonalInfoReq struct {
 type PersonalInfoOutput struct {
 	Id        uint        `json:"id"`
 	Username  string      `json:"username"`
-	Status    string      `d:"normal",dc:"管理员状态，可选值：normal,disabled",d:"normal" json:"status"`
-	Nickname  string      `dc:"昵称",d:"nickname" json:"nickname"`
-	Avatar    string      `dc:"管理员头像地址",d:"http://www.baidu.com" json:"avatar"`
+	Status    string      `d:"normal" dc:"管理员状态，可选值：normal,disabled" json:"status"`
+	Nickname  string      `dc:"昵称" d:"nickname" json:"nickname"`
+	Avatar    string      `dc:"管理员头像地址" d:"http://www.baidu.com" json:"avatar"`
 	CreatedAt *gtime.Time `json:"created_at"`
 }
 
@@ -61,7 +61,6 @@ type PersonalUpdateInput struct {
 	PasswordConfirmed string `json:"password_confirmed"`
 	Nickname          string `json:"nickname"        ` // 昵称
 	Avatar            string `json:"avatar"          ` // 头像地址
-
 }
 
 type PersonalUpdateReq struct {

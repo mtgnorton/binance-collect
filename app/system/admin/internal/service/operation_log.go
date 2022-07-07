@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gf-admin/app/dao"
 	"gf-admin/app/system/admin/internal/define"
+
 	"github.com/gogf/gf/v2/frame/g"
 )
 
@@ -37,6 +38,9 @@ func (o *operationLogService) List(ctx context.Context, in *define.OperationLogI
 
 	err = d.Order(dao.AdminLog.Columns.Id+" desc").Page(in.Page,
 		in.Size).Scan(&out.List)
+	if err != nil {
+		return nil, err
+	}
 	records, err := dao.Administrator.Ctx(ctx).Fields(dao.Administrator.Columns.Id,
 		dao.Administrator.Columns.Username).All()
 

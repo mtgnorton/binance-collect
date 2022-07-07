@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
-	"github.com/gogf/gf/encoding/gbase64"
+	"strings"
+	"time"
+
 	"github.com/gogf/gf/v2/crypto/gaes"
 	"github.com/gogf/gf/v2/crypto/gmd5"
+	"github.com/gogf/gf/v2/encoding/gbase64"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -17,8 +20,6 @@ import (
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/gogf/gf/v2/util/grand"
-	"strings"
-	"time"
 )
 
 const (

@@ -4,6 +4,7 @@ import (
 	"context"
 	"gf-admin/app/system/admin/internal/define"
 	"gf-admin/app/system/admin/internal/service"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -50,7 +51,7 @@ func (a *personal) UploadAvatar(ctx context.Context, req *define.PersonalAvatarR
 		return
 	}
 	res.PersonAvatarOutput, err = service.Personal.Avatar(ctx, id, &define.PersonAvatarInput{
-		file,
+		AvatarFile: file,
 	})
 
 	return

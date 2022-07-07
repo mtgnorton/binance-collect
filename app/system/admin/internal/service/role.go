@@ -5,6 +5,7 @@ import (
 	"gf-admin/app/dao"
 	"gf-admin/app/model/entity"
 	"gf-admin/app/system/admin/internal/define"
+
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -143,6 +144,10 @@ func (r *role) syncRoleMenus(ctx context.Context, roleId uint, menuIds []uint) (
 
 		roleIdentificationVar, err := dao.Role.Ctx(ctx).WherePri(roleId).Value(dao.Role.Columns.Identification)
 
+		if err != nil {
+			return err
+		}
+
 		_, err = Enforcer.DeletePermissionsForUser(ctx, roleIdentificationVar.String())
 
 		if err != nil {
@@ -177,7 +182,7 @@ func (r *role) syncRoleMenus(ctx context.Context, roleId uint, menuIds []uint) (
 		}
 		_, err = dao.RoleMenu.Ctx(ctx).Insert(m)
 
-		return nil
+		return err
 	})
 	return
 }
@@ -191,7 +196,9 @@ func (r *role) All(ctx context.Context) (roles []*entity.Role, err error) {
 
 func (r *role) GetByAdministratorId(ctx context.Context, administratorId uint) (roles []*entity.Role, err error) {
 	roleIds, err := dao.AdministratorRole.Ctx(ctx).Where(dao.AdministratorRole.Columns.AdministratorId, administratorId).Array(dao.AdministratorRole.Columns.RoleId)
-
+	if err != nil {
+		return
+	}
 	roles = []*entity.Role{}
 	err = dao.Role.Ctx(ctx).WherePri(roleIds).Scan(&roles)
 	return

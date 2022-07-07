@@ -8,6 +8,7 @@ import (
 	"gf-admin/app/model/entity"
 	"gf-admin/app/system/admin/internal/define"
 	"gf-admin/utility"
+
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -96,10 +97,16 @@ func (a *administratorService) Store(ctx context.Context, in *define.Administrat
 		if exist > 0 {
 			return gerror.New("管理员用户名已经存在 ")
 		}
+		if err != nil {
+			return err
+		}
 		administrator.Password = utility.EncryptPassword(administrator.Username, administrator.Password)
 		id, err := dao.Administrator.Ctx(ctx).OmitEmptyData().InsertAndGetId(administrator)
 		if id == 0 {
 			return gerror.New("创建失败")
+		}
+		if err != nil {
+			return err
 		}
 		err = a.syncUserRoles(ctx, uint(id), in.RoleIds)
 		return err
@@ -114,6 +121,9 @@ func (a *administratorService) Info(ctx context.Context, in *define.Administrato
 		return
 	}
 	err = dao.Administrator.Ctx(ctx).WherePri(in.Id).Scan(&out.User)
+	if err != nil {
+		return
+	}
 	roleIds, err := dao.AdministratorRole.Ctx(ctx).Where(dao.AdministratorRole.Columns.AdministratorId, in.Id).Array(dao.AdministratorRole.Columns.RoleId)
 	if err != nil {
 		return
@@ -150,6 +160,9 @@ func (a *administratorService) Update(ctx context.Context, in *define.Administra
 			in.Password = utility.EncryptPassword(in.Username, in.Password)
 		}
 		_, err = dao.Administrator.Ctx(ctx).WherePri(in.Id).Update(in)
+		if err != nil {
+			return err
+		}
 		err = a.syncUserRoles(ctx, in.Id, in.RoleIds)
 
 		return err
@@ -160,6 +173,9 @@ func (a *administratorService) Update(ctx context.Context, in *define.Administra
 func (a *administratorService) Destroy(ctx context.Context, in *define.AdministratorDestroyInput) (err error) {
 
 	administratorNameVar, err := dao.Administrator.Ctx(ctx).WherePri(in.Ids).Value(dao.Administrator.Columns.Username)
+	if err != nil {
+		return err
+	}
 	affected, err := dao.Administrator.Ctx(ctx).WherePri(in.Ids).Delete()
 	if err != nil {
 		return err
@@ -191,8 +207,14 @@ func (a *administratorService) syncUserRoles(ctx context.Context, administratorI
 	return dao.AdministratorRole.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
 
 		administratorNameVar, err := dao.Administrator.Ctx(ctx).WherePri(administratorId).Value(dao.Administrator.Columns.Username)
+		if err != nil {
+			return err
+		}
 		_, err = Enforcer.DeleteUser(administratorNameVar.String())
 
+		if err != nil {
+			return err
+		}
 		for _, roleId := range roleIds {
 			roleNameVar, err := dao.Role.Ctx(ctx).WherePri(roleId).Value(dao.Role.Columns.Identification)
 			if err != nil {
@@ -234,13 +256,22 @@ func (a *administratorService) GetAdministratorSummary(ctx context.Context, admi
 		return admin, err
 	}
 	roles, err := Role.GetByAdministratorId(ctx, administratorId)
+	if err != nil {
+		return admin, err
+	}
 	err = gconv.Scan(roles, &admin.Roles)
 	if err != nil {
 		return admin, err
 	}
 	menus, err := Menu.GetByAdministratorId(ctx, administratorId)
+	if err != nil {
+		return admin, err
+	}
 	err = gconv.Scan(menus, &admin.Menus)
 
+	if err != nil {
+		return admin, err
+	}
 	if admin.Roles == nil {
 		admin.Roles = []*model.RoleShow{}
 	}

@@ -3,11 +3,12 @@ package define
 import (
 	"gf-admin/app/model"
 	"gf-admin/app/model/entity"
+
 	"github.com/gogf/gf/v2/frame/g"
 )
 
 type RoleStoreReq struct {
-	g.Meta `path:"/role-store" method:"post",summary:"添加角色",tags:"角色管理"`
+	g.Meta `path:"/role-store" method:"post" summary:"添加角色" tags:"角色管理"`
 	RoleStoreInput
 }
 
