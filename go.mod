@@ -12,4 +12,4 @@ require (
 
 require go.opentelemetry.io/otel v1.3.0 // indirect
 
-go 1.14
+go 1.18
