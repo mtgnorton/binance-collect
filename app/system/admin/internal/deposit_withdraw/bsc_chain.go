@@ -287,7 +287,7 @@ func (b *BscChain) GetDetectNumber(ctx context.Context) (newestNumber, detectNum
 	detectNumber = newestNumber
 
 	// 如果已经扫描过，不再扫描
-	if newestNumber == cacheNumber.Int() {
+	if newestNumber <= cacheNumber.Int() {
 		return newestNumber, 0, nil
 	}
 	// 区块是连续产生的，为了避免跳块，此时直接使用缓存中记录的区块加一
