@@ -1,17 +1,15 @@
-package shared_test
+package shared
 
 import (
 	"fmt"
-	"gf-admin/app/shared"
 	"testing"
 
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/test/gtest"
 )
 
 var (
-	tokenHandler = shared.TokenHandler{}
+	tokenHandler = TokenHandler{}
 	userKey      = "admin"
 	data         = g.Map{
 		"username": "admin",
@@ -20,7 +18,6 @@ var (
 		"status":   "normal",
 		"remark":   "备注",
 	}
-	ctx = gctx.New()
 )
 
 func TestTokenHandler_TokenGenerateAndSaveData(t *testing.T) {
@@ -31,7 +28,7 @@ func TestTokenHandler_TokenGenerateAndSaveData(t *testing.T) {
 		fmt.Printf("TestTokenHandler_TokenGenerateAndSaveData Token is %s\n", token)
 	})
 	gtest.C(t, func(t *gtest.T) { //测试redis缓存
-		tokenHandler.CacheMode = shared.CacheModeRedis
+		tokenHandler.CacheMode = CacheModeRedis
 		tokenHandler.Init(ctx)
 		token, err := tokenHandler.GenerateAndSaveData(ctx, userKey, data)
 		t.AssertNil(err)
@@ -40,15 +37,15 @@ func TestTokenHandler_TokenGenerateAndSaveData(t *testing.T) {
 
 }
 
-func TestTokenHandler_Validate(t *testing.T) {
-	gtest.C(t, func(t *gtest.T) {
-		tokenHandler.CacheMode = shared.CacheModeRedis
-		tokenHandler.Init(ctx)
-		r, err := tokenHandler.Validate(ctx, "VYgiJ280XDOohxfueR6bE/P3w6qoIJaWcABC4T2YNeZGv07NOK3TGriPQoJYRm8V")
-		t.AssertNil(err)
-		fmt.Printf("TestTokenHandler_TokenValidate result is %s\n", &r)
-	})
-}
+//func TestTokenHandler_Validate(t *testing.T) {
+//	gtest.C(t, func(t *gtest.T) {
+//		tokenHandler.CacheMode = CacheModeRedis
+//		tokenHandler.Init(ctx)
+//		r, err := tokenHandler.Validate(ctx, "VYgiJ280XDOohxfueR6bE/P3w6qoIJaWcABC4T2YNeZGv07NOK3TGriPQoJYRm8V")
+//		t.AssertNil(err)
+//		fmt.Printf("TestTokenHandler_TokenValidate result is %s\n", &r)
+//	})
+//}
 
 func TestTokenHandler_TokenValidate(t *testing.T) {
 
@@ -89,7 +86,7 @@ func TestTokenHandler_TokenRemove(t *testing.T) {
 
 func TestTokenHandler_TokenGetData(t *testing.T) {
 	gtest.C(t, func(t *gtest.T) {
-		tokenHandler.CacheMode = shared.CacheModeRedis
+		tokenHandler.CacheMode = CacheModeRedis
 		tokenHandler.Init(ctx)
 		token, err := tokenHandler.GenerateAndSaveData(ctx, userKey, data)
 		t.AssertNil(err)

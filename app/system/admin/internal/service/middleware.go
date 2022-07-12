@@ -7,14 +7,15 @@ import (
 	"gf-admin/app/dto"
 	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
+	"reflect"
+	"strings"
+
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gutil"
-	"reflect"
-	"strings"
 )
 
 // 中间件管理服务
@@ -50,7 +51,7 @@ func (s *serviceMiddleware) OperationLog(r *ghttp.Request) {
 	}
 	params := r.GetMap()
 
-	responseContent, err := r.GetHandlerResponse()
+	responseContent := r.GetHandlerResponse()
 
 	if err != nil {
 		responseContent = err.Error()
@@ -99,16 +100,12 @@ func (s *serviceMiddleware) ResponseHandler(r *ghttp.Request) {
 	}
 
 	var (
-		err  error
 		msg  string
 		res  interface{}
 		code gcode.Code = gcode.CodeOK
 	)
 
-	res, err = r.GetHandlerResponse()
-	if err != nil {
-		response.JsonErrorLogExit(r, err)
-	}
+	res = r.GetHandlerResponse()
 
 	if msg == "" {
 		if strings.Contains(r.URL.Path, "-update") {

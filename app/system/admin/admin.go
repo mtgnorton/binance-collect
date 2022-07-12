@@ -9,10 +9,10 @@ import (
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/net/goai"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gsession"
-	"github.com/gogf/gf/v2/protocol/goai"
 	"github.com/gogf/gf/v2/util/gmode"
 )
 
@@ -121,6 +121,7 @@ func sessionConfig(s *ghttp.Server) {
 		g.Log().Fatalf(gctx.New(), "init session driver error, %s", err)
 	}
 }
+
 func enhanceOpenAPIDoc(s *ghttp.Server) {
 	openapi := s.GetOpenApi()
 	openapi.Config.CommonResponse = ghttp.DefaultHandlerResponse{}
