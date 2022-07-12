@@ -13,4 +13,4 @@ require (
 	github.com/vance-liu/gdb-adapter v0.0.0-20210726030015-5216d47793bb
 )
 
-go 1.14
+go 1.15
