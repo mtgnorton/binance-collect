@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gstructs"
-	"reflect"
 )
 
 type cMain struct {
@@ -112,6 +113,7 @@ func main() {
 		RecursiveOption: gstructs.RecursiveOptionEmbeddedNoTag,
 	})
 
+	g.Dump(err)
 	//map[string]string(4) {
 	//    string("arg"):   string(4) "true",
 	//    string("brief"): string(11) "server name",
