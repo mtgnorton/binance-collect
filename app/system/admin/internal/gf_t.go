@@ -113,7 +113,6 @@ func main() {
 		RecursiveOption: gstructs.RecursiveOptionEmbeddedNoTag,
 	})
 
-	g.Dump(err)
 	//map[string]string(4) {
 	//    string("arg"):   string(4) "true",
 	//    string("brief"): string(11) "server name",

@@ -2,6 +2,7 @@ package response
 
 import (
 	"gf-admin/utility/custom_log"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -65,6 +66,7 @@ func JsonRedirect(r *ghttp.Request, code int, message, redirect string, data ...
 		Data:     responseData,
 		Redirect: redirect,
 	})
+
 }
 
 // JsonRedirectExit 返回标准JSON数据引导客户端跳转，并退出当前HTTP执行函数。
