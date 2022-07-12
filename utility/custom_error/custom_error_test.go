@@ -1,65 +1,66 @@
 package custom_error
 
 import (
-	"bytes"
+	"encoding/json"
 	"errors"
-	"github.com/gogf/gf/v2/errors/gerror"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gctx"
-	"github.com/gogf/gf/v2/test/gtest"
-	"github.com/gogf/gf/v2/util/gutil"
 	"testing"
+
+	"github.com/gogf/gf/v2/errors/gerror"
+
+	"github.com/gogf/gf/v2/test/gtest"
 )
 
-var ctx = gctx.New()
-
-func Test_New(t *testing.T) {
+func Test_New_Wrap_Error(t *testing.T) {
 
 	//用户自定义错误
 	gtest.C(t, func(t *gtest.T) {
-		e := New("自定义错误", map[string]interface{}{"token": "123456"}, []string{"token"})
-		catchError(e)
-	})
+		err := New("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
+		t.Assert(gerror.Current(err), "自定义错误")
+		contextInfo, err := getContextVariables(err)
 
+		t.Assert(err, nil)
+		t.Assert(contextInfo, `[{"name":"jack"},["card"]]`)
+
+	})
+	//包裹自定义错误
 	gtest.C(t, func(t *gtest.T) {
-		e := New("自定义错误", map[string]interface{}{"token": "123456"}, []string{"token"})
-		ew := Wrap(e, "自定义错误外层", map[string]interface{}{"token": "fffff"}, []string{"fff"})
-		catchError(ew)
+		err := New("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
+		ew := Wrap(err, "包裹自定义错误", map[string]interface{}{"age": 18}, []string{"user"})
+		t.Assert(gerror.Current(ew), "包裹自定义错误")
+		contextInfo, err := getContextVariables(ew)
+		t.Assert(err, nil)
+		t.Assert(contextInfo, `[{"age":18},["user"]]`)
 	})
 
+	//包裹原始错误
 	gtest.C(t, func(t *gtest.T) {
 		e := errors.New("原始错误")
 
-		token := "sdfafdafasdf"
-		ew := Wrap(e, "自定义错误", map[string]interface{}{"token": token})
-		catchError(ew)
-	})
+		ew := Wrap(e, "包裹自定义错误", map[string]interface{}{"name": "jack"})
 
+		t.Assert(gerror.Current(ew), "包裹自定义错误")
+
+		contextInfo, err := getContextVariables(ew)
+		t.Assert(err, nil)
+		t.Assert(contextInfo, `[{"name":"jack"}]`)
+	})
+	//包裹原始错误
 	gtest.C(t, func(t *gtest.T) {
 
 		err := gerror.New("goframe 错误")
 		ew := Wrap(err, "")
-		catchError(ew)
+		t.Assert(gerror.Current(ew), "未知错误")
+		contextInfo, err := getContextVariables(ew)
+		t.Assert(err, nil)
+		t.Assert(contextInfo, `null`)
 
 	})
 }
 
-func catchError(err error) {
+func getContextVariables(err error) (string, error) {
 	code := gerror.Code(err)
-	//if code == gcode.CodeNil && err != nil {
-	//	code = gcode.CodeInternalError
-	//}
-	//堆栈日志
-	g.Log().Infof(ctx, "error occur:%+v", gerror.Stack(err))
+	c, err := json.Marshal(code.Detail())
 
-	buffer := &bytes.Buffer{}
-
-	g.DumpTo(buffer, code.Detail(), gutil.DumpOption{})
-
-	//上下文信息
-	g.Log().Printf(ctx, "context info:%+v", buffer.String())
-
-	//用户信息
-	g.Dump(gerror.Current(err))
+	return string(c), err
 
 }

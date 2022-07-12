@@ -6,6 +6,8 @@ import (
 	"gf-admin/app/model/entity"
 	_ "gf-admin/packed"
 	"gf-admin/utility"
+
+	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gcmd"

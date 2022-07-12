@@ -2,13 +2,12 @@ package service
 
 import (
 	"fmt"
-	"github.com/gogf/gf/v2/os/gctx"
-	"github.com/gogf/gf/v2/test/gtest"
 	"testing"
+
+	"github.com/gogf/gf/v2/test/gtest"
 )
 
 var (
-	ctx     = gctx.New()
 	adminId = uint(1)
 )
 

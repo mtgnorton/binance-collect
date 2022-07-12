@@ -163,7 +163,6 @@ func (ws *wsService) RemoveUser(userId uint, indexOption ...int) bool {
 		users = append(users[:index], users[index+1:]...)
 		ws.wsUsersMap[userId] = users
 
-		fmt.Println("ssssssfsdfs")
 		for _, user := range users { //移除整个slice
 			user.Clear()
 		}
@@ -243,11 +242,10 @@ func (user *wsUser) Clear() {
 }
 
 const (
-	WsMessageTypeHeart   = "heart"
-	WsMessageTypeSystem  = "system"
-	WsMessageTypeBinance = "binance"
-	WsMessageTypeError   = "error"
-	WsMessageTypeDebug   = "debug"
+	WsMessageTypeHeart  = "heart"
+	WsMessageTypeSystem = "system"
+	// WsMessageTypeError  = "error"
+	// WsMessageTypeDebug  = "debug"
 )
 
 //接受和发送的消息格式

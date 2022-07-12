@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os/exec"
+
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/text/gstr"
-	"os/exec"
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 		"/app/service/internal/dto":          "/app/dto/",
 	}
 	for tempSource, tempDst := range Dirs {
-		gfile.ScanDirFileFunc(rootPath+tempSource, "", false, func(path string) string {
+		_, err = gfile.ScanDirFileFunc(rootPath+tempSource, "", false, func(path string) string {
 			dst := rootPath + tempDst + gfile.Basename(path)
 			content := gfile.GetContents(path)
 
@@ -47,7 +48,9 @@ func main() {
 			g.Log().Infof(ctx, "%s 移动到 %s \n", path, dst)
 			return path
 		})
+		g.Dump(err)
 	}
 
-	gfile.Remove(rootPath + "/app/service")
+	err = gfile.Remove(rootPath + "/app/service")
+	g.Dump(err)
 }
