@@ -178,7 +178,6 @@ func (t *TokenHandler) Validate(ctx context.Context, token string) (tf TokenFram
 	}
 
 	if tf1.GetUUID() != tf2.GetUUID() {
-		g.Dump("tf1,tf2", token, tf1, tf2)
 		return tf2, gerror.New("用户token错误")
 	}
 	return tf2, nil
@@ -222,7 +221,6 @@ func (t *TokenHandler) Remove(ctx context.Context, token string) (err error) {
 func (t *TokenHandler) GetData(ctx context.Context, userKey string) (tf TokenFrame, err error) {
 	cacheKey := t.CacheKey + userKey
 
-	g.Dump("cache key", cacheKey)
 	tf, err = t.cacheGet(ctx, cacheKey)
 	if err != nil {
 		return tf, err
@@ -242,6 +240,7 @@ func (t *TokenHandler) GetData(ctx context.Context, userKey string) (tf TokenFra
 
 /*根据userKey和uuid生成token*/
 func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...string) (tf TokenFrame, err error) {
+	_ = ctx
 	tf = TokenFrame{UserKey: userKey}
 	if userKey == "" {
 		return tf, gerror.New("encrypt UserKey empty")
@@ -254,8 +253,9 @@ func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...stri
 	}
 	tokenTemp := userKey + "_" + tf.GetUUID()
 	token, err := gaes.Encrypt([]byte(tokenTemp), t.EncryptKey)
+
 	if err != nil {
-		return tf, gerror.Wrap(err, "gaes encrypt Token error")
+		return tf, custom_error.Wrap(err, "gaes encrypt Token error", g.Map{"token": tokenTemp, "key": t.EncryptKey})
 	}
 	tf.Token = string(gbase64.Encode(token))
 	//为了使token可以作为url参数需要对+/进行替换，替换为-_
@@ -267,6 +267,7 @@ func (t *TokenHandler) encrypt(ctx context.Context, userKey string, uuid ...stri
 /*将token解密为userKey和uuid*/
 func (t *TokenHandler) decrypt(ctx context.Context, token string) (tf TokenFrame, err error) {
 
+	_ = ctx
 	tf = TokenFrame{
 		Token: token,
 	}
@@ -304,7 +305,6 @@ func (t *TokenHandler) cacheGet(ctx context.Context, key string) (tf TokenFrame,
 			return tf, custom_error.Wrap(err, "")
 		}
 		if valueVar.IsNil() || valueVar.IsEmpty() {
-			g.Dump("redis", key)
 			return tf, custom_error.New("用户尚未登录")
 		}
 
@@ -326,7 +326,6 @@ func (t *TokenHandler) cacheSet(ctx context.Context, key string, value TokenFram
 	switch t.CacheMode {
 	case CacheModeRedis:
 
-		g.Dump("cacheset", key, value)
 		if t.Timeout == 0 {
 			_, err = g.Redis().Do(ctx, "set", key, value)
 		} else {

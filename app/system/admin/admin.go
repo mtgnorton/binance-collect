@@ -108,7 +108,7 @@ func Run(ctx context.Context) {
 		},
 	})
 
-	controller.Ws.MonitorSystem(ctx)
+	//controller.Ws.MonitorSystem(ctx)
 	// 启动Http Server
 	s.Run()
 }

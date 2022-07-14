@@ -1,26 +1,11 @@
-FROM loads/alpine:3.8
+FROM  --platform=linux/amd64  golang:1.17
 
-LABEL maintainer="john@goframe.org"
+WORKDIR /usr/src/app
 
-###############################################################################
-#                                INSTALLATION
-###############################################################################
+# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
 
-# 设置固定的项目路径
-ENV WORKDIR /var/www/gf-admin
 
-# 添加应用可执行文件，并设置执行权限
-ADD ./bin/linux_amd64/main   $WORKDIR/main
-RUN chmod +x $WORKDIR/main
+CMD ["go","version"]
 
-# 添加I18N多语言文件、静态文件、配置文件、模板文件
-ADD i18n     $WORKDIR/i18n
-ADD public   $WORKDIR/public
-ADD config   $WORKDIR/config
-ADD template $WORKDIR/template
-
-###############################################################################
-#                                   START
-###############################################################################
-WORKDIR $WORKDIR
-CMD ./main

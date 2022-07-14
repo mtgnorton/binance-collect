@@ -2,9 +2,10 @@ package utility
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
-	"time"
 )
 
 type MemoryInfo struct {
@@ -13,14 +14,14 @@ type MemoryInfo struct {
 
 func GetMemoryInfo() (info MemoryInfo, err error) {
 	info = MemoryInfo{}
-	memory, err := memory.Get()
+	memoryInfo, err := memory.Get()
 	if err != nil {
 		return
 	}
-	info.Percent = fmt.Sprintf("%.2f%%", float64(memory.Used)/float64(memory.Total)*100)
-	info.Used = fmt.Sprintf("%.2fGB", float64(memory.Used)/(1<<10<<10<<10))
-	info.Free = fmt.Sprintf("%.2fGB", float64(memory.Total-memory.Used)/(1<<10<<10<<10))
-	info.Total = fmt.Sprintf("%.2fGB", float64(memory.Total)/(1<<10<<10<<10))
+	info.Percent = fmt.Sprintf("%.2f%%", float64(memoryInfo.Used)/float64(memoryInfo.Total)*100)
+	info.Used = fmt.Sprintf("%.2fGB", float64(memoryInfo.Used)/(1<<10<<10<<10))
+	info.Free = fmt.Sprintf("%.2fGB", float64(memoryInfo.Total-memoryInfo.Used)/(1<<10<<10<<10))
+	info.Total = fmt.Sprintf("%.2fGB", float64(memoryInfo.Total)/(1<<10<<10<<10))
 	return
 }
 

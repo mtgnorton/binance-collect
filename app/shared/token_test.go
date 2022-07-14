@@ -1,9 +1,16 @@
 package shared
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"reflect"
 	"testing"
 
+	"github.com/gogf/gf/v2/container/gvar"
+
+	"bou.ke/monkey"
+	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/test/gtest"
 )
@@ -98,4 +105,36 @@ func TestTokenHandler_TokenGetData(t *testing.T) {
 		fmt.Printf("TestTokenHandler_TokenGetData data is %s", &data)
 	})
 
+}
+
+func setup() {
+	// 使用monkey模拟redis的赋值和取值操作
+	keyValueMap := make(map[string]*gvar.Var)
+	monkey.PatchInstanceMethod(reflect.TypeOf(g.Redis()), "Do", func(redis *gredis.Redis, ctx context.Context, command string, args ...interface{}) (*gvar.Var, error) {
+		if command == "setex" {
+			keyValueMap[args[0].(string)] = gvar.New(args[2])
+			return nil, nil
+		}
+		if command == "set" {
+			keyValueMap[args[0].(string)] = gvar.New(args[1])
+			return nil, nil
+		}
+
+		if command == "get" {
+			return gvar.New(keyValueMap[args[0].(string)]), nil
+		}
+		return nil, nil
+	})
+}
+
+func teardown() {
+	monkey.UnpatchAll()
+}
+
+// 如果测试文件中包含函数 TestMain，那么生成的测试将调用 TestMain(m)，而不是直接运行测试
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	teardown()
+	os.Exit(code)
 }
