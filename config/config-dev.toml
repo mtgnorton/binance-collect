@@ -70,7 +70,7 @@
 
 [[gfcli.gen.dao]]
    link     = "mysql:root:secret@tcp(127.0.0.1:3306)/gf-admin"
-   removePrefix = "ga_"
+   removePrefix = "ga_,forum"
    overwriteDao = true
    modelFile = "all.go"
    jsonCase = "snake"
