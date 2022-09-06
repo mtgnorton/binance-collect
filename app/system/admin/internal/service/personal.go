@@ -67,8 +67,10 @@ func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInpu
 		return
 	}
 
-	token, err := AdminTokenInstance.LoadConfig().GenerateAndSaveData(ctx, in.Username, adminSummary)
-
+	token, err := AdminTokenInstance.LoadConfig().TokenHandler.GenerateAndSaveData(ctx, in.Username, adminSummary)
+	if err != nil {
+		return
+	}
 	out.Token = token
 	shared.Context.SetUser(ctx, adminSummary)
 
@@ -125,7 +127,7 @@ func (p *personalService) Avatar(ctx context.Context, id uint, in *define.Person
 	if err != nil {
 		return
 	}
-	err = AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
+	err = AdminTokenInstance.TokenHandler.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
 	if err != nil {
 		return
 	}
@@ -167,7 +169,7 @@ func (p *personalService) Update(ctx context.Context, administrator *model.Admin
 	if err != nil {
 		return err
 	}
-	err = AdminTokenInstance.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
+	err = AdminTokenInstance.TokenHandler.UpdateData(ctx, updatedAdministrator.Username, updatedAdministrator)
 
 	return
 }

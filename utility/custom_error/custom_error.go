@@ -37,14 +37,14 @@ func Stack(err error) string {
 			}
 			return gerror.Stack(err)
 		}
-		if _, ok := e.Next().(*gerror.Error); !ok {
+		if _, ok := e.Unwrap().(*gerror.Error); !ok {
 			if layer > 0 {
 				return message + "\n" + gerror.Stack(err)
 			}
 			return gerror.Stack(err)
 		}
 		layer++
-		err = e.Next()
+		err = e.Unwrap()
 	}
 
 }

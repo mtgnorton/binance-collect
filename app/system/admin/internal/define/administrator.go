@@ -46,10 +46,8 @@ type AdministratorListInput struct {
 }
 
 type AdministratorListOutput struct {
-	List  []*entity.Administrator `json:"list"`
-	Page  int                     `json:"page"`
-	Size  int                     `json:"size"`
-	Total int                     `json:"total"`
+	List []*entity.Administrator `json:"list"`
+	model.PageSizeOutput
 }
 
 /*获取用户信息*/
