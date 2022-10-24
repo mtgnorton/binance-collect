@@ -1,6 +1,7 @@
 package define
 
 import (
+	"gf-admin/app/model"
 	"gf-admin/app/model/entity"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -16,12 +17,28 @@ type NodeListRes struct {
 }
 
 type NodeListOutput struct {
-	List []*entity.Nodes
+	List []*entity.Nodes `json:"list"`
+	model.PageSizeOutput
 }
 
 type NodeListInput struct {
 	Name    string `json:"name"`
 	IsIndex string `v:"in:1,0" json:"is_index"`
+	model.PageSizeInput
+	model.OrderFieldDirectionInput
+}
+
+type NodeInfoReq struct {
+	g.Meta `path:"/node-info" method:"get" summary:"节点详情" tags:"节点管理"`
+	Id     uint `json:"id" dc:"id" v:"min:1#请选择节点id"`
+}
+
+type NodeInfoRes struct {
+	*NodeInfoOutput
+}
+
+type NodeInfoOutput struct {
+	entity.Nodes
 }
 
 type NodeStoreInput struct {

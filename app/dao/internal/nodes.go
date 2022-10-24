@@ -19,24 +19,26 @@ type NodesDao struct {
 
 // NodesColumns defines and stores column names for table forum_nodes.
 type NodesColumns struct {
-	Id          string //
-	Name        string // 节点名称
-	Description string // 节点描述
-	IsIndex     string // 是否首页显示
-	IsCanEdit   string // 是否允许编辑
-	CreatedAt   string // 创建时间
-	DeletedAt   string // 删除时间
+	Id             string //
+	Name           string // 节点名称
+	Description    string // 节点描述
+	IsIndex        string // 是否首页显示
+	IsDisabledEdit string // 是否禁用编辑和删除,1是 0否
+	Sort           string // 显示顺序越小越靠前
+	CreatedAt      string // 创建时间
+	DeletedAt      string // 删除时间
 }
 
 //  NodesColumns holds the columns for table forum_nodes.
 var nodesColumns = NodesColumns{
-	Id:          "id",
-	Name:        "name",
-	Description: "description",
-	IsIndex:     "is_index",
-	IsCanEdit:   "is_can_edit",
-	CreatedAt:   "created_at",
-	DeletedAt:   "deleted_at",
+	Id:             "id",
+	Name:           "name",
+	Description:    "description",
+	IsIndex:        "is_index",
+	IsDisabledEdit: "is_disabled_edit",
+	Sort:           "sort",
+	CreatedAt:      "created_at",
+	DeletedAt:      "deleted_at",
 }
 
 // NewNodesDao creates and returns a new DAO object for table data access.

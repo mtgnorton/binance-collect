@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gf-admin/app/dao"
 	"gf-admin/app/system/admin/internal/define"
-	"gf-admin/utility/custom_error"
+	"gf-admin/utility/response"
 
 	"github.com/gogf/gf/v2/os/gtime"
 
@@ -66,7 +66,7 @@ func (u *user) ToggleDestroy(ctx context.Context, in *define.UserToggleDestroyIn
 		return err
 	}
 	if userCount == 0 {
-		return custom_error.New("用户不存在", g.Map{})
+		return response.NewError("用户不存在", g.Map{})
 	}
 	updateValue := gtime.Now()
 

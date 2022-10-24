@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gf-admin/app/dao"
+	"gf-admin/app/model/entity"
 	"gf-admin/app/system/admin/internal/define"
 
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -17,6 +18,7 @@ type node struct {
 
 func (n *node) List(ctx context.Context, in *define.NodeListInput) (output *define.NodeListOutput, err error) {
 	output = &define.NodeListOutput{}
+	output.List = make([]*entity.Nodes, 0)
 	d := dao.Nodes.Ctx(ctx)
 	if in.Name != "" {
 		d = d.WhereLike(dao.Nodes.Columns().Name, fmt.Sprintf("%%%s%%", in.Name))
@@ -26,6 +28,16 @@ func (n *node) List(ctx context.Context, in *define.NodeListInput) (output *defi
 		d = d.Where(dao.Nodes.Columns().IsIndex, in.IsIndex)
 	}
 
+	output.Page = in.Page
+	output.Size = in.Size
+	output.Total, err = d.Count()
+	if err != nil {
+		return output, err
+	}
+	d = d.Page(in.Page, in.Size).Order(dao.Nodes.Columns().Id + " desc")
+	if in.OrderField != "" && in.OrderDirection != "" {
+		d = d.Order(in.OrderField + " " + in.OrderDirection)
+	}
 	err = d.Scan(&output.List)
 
 	return
@@ -70,6 +82,13 @@ func (n *node) Destroy(ctx context.Context, Id uint) (err error) {
 	d := dao.Nodes.Ctx(ctx)
 	_, err = d.WherePri(Id).Delete()
 	return err
+}
+
+func (n *node) Info(ctx context.Context, Id uint) (output *define.NodeInfoOutput, err error) {
+	output = &define.NodeInfoOutput{}
+	d := dao.Nodes.Ctx(ctx)
+	err = d.WherePri(Id).Scan(&output)
+	return
 }
 
 func (n *node) ExistById(ctx context.Context, Id uint) (err error) {

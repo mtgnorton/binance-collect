@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"gf-admin/app/shared"
 	"gf-admin/app/system/admin/internal/define"
 	"gf-admin/app/system/admin/internal/service"
 )
@@ -30,6 +31,6 @@ func (l *noAuth) Login(ctx context.Context, req *define.PersonalLoginReq) (res *
 func (l *noAuth) LoginCaptcha(ctx context.Context, req *define.NoAuthLoginCaptchaReq) (res *define.NoAuthLoginCaptchaRes, err error) {
 
 	res = &define.NoAuthLoginCaptchaRes{}
-	res.CommonGenerateCaptchaOutput, err = service.Common.GenerateCaptcha(ctx)
+	res.CommonGenerateCaptchaOutput, err = shared.Captcha.Generate(ctx)
 	return
 }

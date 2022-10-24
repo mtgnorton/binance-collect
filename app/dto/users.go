@@ -18,12 +18,13 @@ type Users struct {
 	Description         interface{} // 简介
 	Password            interface{} // MD5密码
 	Avatar              interface{} // 头像地址
-	Status              interface{} // 状态：000000  低位->高位 第一位为1 禁止登录,第二位为1 禁止发帖,第三位为1 禁止回复
+	Status              interface{} // 状态：disable_login | disable_posts | disable_reply
 	PostsAmount         interface{} // 创建主题次数
 	ReplyAmount         interface{} // 回复次数
 	ShieldedAmount      interface{} // 被屏蔽次数
 	FollowByOtherAmount interface{} // 被关注次数
 	TodayActivity       interface{} // 今日活跃度
+	Balance             interface{} // 余额
 	Remark              interface{} // 备注
 	LastLoginIp         interface{} // 最后登陆IP
 	LastLoginTime       *gtime.Time // 最后登陆时间

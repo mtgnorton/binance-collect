@@ -13,6 +13,7 @@ import (
 type Replies struct {
 	g.Meta          `orm:"table:forum_replies, do:true"`
 	Id              interface{} //
+	PostsId         interface{} // 主题id
 	UserId          interface{} // 用户id
 	Username        interface{} // 用户名
 	RelationUserIds interface{} // 涉及用户ids，多个以逗号分隔
@@ -20,6 +21,7 @@ type Replies struct {
 	CharacterAmount interface{} // 字符长度
 	ThanksAmount    interface{} // 感谢次数
 	ShieldedAmount  interface{} // 被屏蔽次数
+	Status          interface{} // 状态：no_audit, normal, shielded
 	CreatedAt       *gtime.Time // 创建时间
 	UpdatedAt       *gtime.Time // 更新时间
 	DeletedAt       *gtime.Time // 删除时间

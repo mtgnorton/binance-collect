@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	table := "forum_messages" //ga_admin_log
+	table := "forum_posts" //ga_admin_log
 
 	ctx := gctx.New()
 
@@ -42,6 +42,10 @@ func main() {
 
 			filename := gfile.Basename(sourcePath)
 
+			if gstr.HasPrefix(filename, "_") {
+				filename = gstr.TrimLeft(filename, "_")
+			}
+
 			dstPath := rootPath + tempDst + filename
 
 			content := gfile.GetContents(sourcePath)
@@ -57,6 +61,11 @@ func main() {
 				content = gstr.Replace(content, "var "+ucFirstFieldName, "var "+lcFirstFieldName)
 
 				content = gstr.Replace(content, "columns: "+ucFirstFieldName, "columns: "+lcFirstFieldName)
+			}
+
+			// app/dto 命令空间由 do 转为dto
+			if gstr.Contains(tempSource, "/app/service/internal/do") {
+				content = gstr.Replace(content, "package do", "package dto")
 			}
 
 			err = gfile.PutContents(dstPath, content)

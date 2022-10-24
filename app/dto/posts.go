@@ -11,23 +11,26 @@ import (
 
 // Posts is the golang structure of table forum_posts for DAO operations like Where/Data.
 type Posts struct {
-	g.Meta           `orm:"table:forum_posts, do:true"`
-	Id               interface{} //
-	NodeId           interface{} // 节点id
-	UserId           interface{} // 用户id
-	Username         interface{} // 用户名
-	Title            interface{} // 标题
-	Content          interface{} // 内容
-	TopEndTime       *gtime.Time // 置顶截止时间,为空说明没有置顶
-	CharacterAmount  interface{} // 字符长度
-	VisitsAmount     interface{} // 访问次数
-	CollectionAmount interface{} // 收藏次数
-	ReplyAmount      interface{} // 回复次数
-	ThanksAmount     interface{} // 感谢次数
-	ShieldedAmount   interface{} // 被屏蔽次数
-	Weight           interface{} // 权重
-	ReplyLastTime    *gtime.Time // 最后回复时间
-	CreatedAt        *gtime.Time // 主题创建时间
-	UpdatedAt        *gtime.Time // 主题更新时间
-	DeletedAt        *gtime.Time // 删除时间
+	g.Meta            `orm:"table:forum_posts, do:true"`
+	Id                interface{} //
+	NodeId            interface{} // 节点id
+	UserId            interface{} // 用户id
+	Username          interface{} // 用户名
+	Title             interface{} // 标题
+	Content           interface{} // 内容
+	TopEndTime        *gtime.Time // 置顶截止时间,为空说明没有置顶
+	CharacterAmount   interface{} // 字符长度
+	VisitsAmount      interface{} // 访问次数
+	CollectionAmount  interface{} // 收藏次数
+	ReplyAmount       interface{} // 回复次数
+	ThanksAmount      interface{} // 感谢次数
+	ShieldedAmount    interface{} // 被屏蔽次数
+	Status            interface{} // 状态：no_audit, normal, shielded
+	Weight            interface{} // 权重
+	ReplyLastUserId   interface{} // 最后回复用户id
+	ReplyLastUsername interface{} // 最后回复用户名
+	ReplyLastTime     *gtime.Time // 最后回复时间
+	CreatedAt         *gtime.Time // 主题创建时间
+	UpdatedAt         *gtime.Time // 主题更新时间
+	DeletedAt         *gtime.Time // 删除时间
 }

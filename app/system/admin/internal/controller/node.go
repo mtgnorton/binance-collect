@@ -17,17 +17,23 @@ func (n *node) List(ctx context.Context, req *define.NodeListReq) (res *define.N
 	return
 }
 
-func (n *node) Store(ctx context.Context, req *define.NodeStoreReq) (err error) {
+func (n *node) Store(ctx context.Context, req *define.NodeStoreReq) (res *define.NodeStoreRes, err error) {
 	err = service.Node.Store(ctx, req.NodeStoreInput)
 	return
 }
 
-func (n *node) Update(ctx context.Context, req *define.NodeUpdateReq) (err error) {
+func (n *node) Update(ctx context.Context, req *define.NodeUpdateReq) (res *define.NodeUpdateRes, err error) {
 	err = service.Node.Update(ctx, req.NodeUpdateInput)
 	return
 }
 
-func (n *node) Destroy(ctx context.Context, req *define.NodeDestroyReq) (err error) {
+func (n *node) Destroy(ctx context.Context, req *define.NodeDestroyReq) (res *define.NodeDestroyRes, err error) {
 	err = service.Node.Destroy(ctx, req.Id)
+	return
+}
+
+func (n *node) Info(ctx context.Context, req *define.NodeInfoReq) (res *define.NodeInfoRes, err error) {
+	res = &define.NodeInfoRes{}
+	res.NodeInfoOutput, err = service.Node.Info(ctx, req.Id)
 	return
 }

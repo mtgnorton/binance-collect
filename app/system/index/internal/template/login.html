@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{.Title}}</title>
+</head>
+
+<body>
+
+{{include "header.html" .}}
+
+<div class="sep20"></div>
+
+<div class="container-wrapper">
+    <div class="container">
+        <div class="main">
+
+
+            <div class="crumb">
+                <a href="/">V2EX</a>
+                <span class="chevron">&nbsp;›&nbsp;</span>
+
+                <span> 登录 &nbsp;</span>
+
+            </div>
+
+            <div class="problem" style="display: none">
+                请解决以下问题然后再提交：
+                <ul></ul>
+            </div>
+
+            <div class="box center">
+                <div class="f-c">
+                    <form action="/auth-login">
+                        <div class="f-ele-c">
+                            <label class="f-ele-l">用户名</label>
+                            <input class="f-ele" type="text" name="username" value="mtgnorton">
+                        </div>
+
+
+                        <div class="f-ele-c">
+                            <label class="f-ele-l">密码</label>
+
+                            <input class="f-ele" type="password" name="password" value="123456">
+                        </div>
+
+                        <div class="f-ele-c">
+                            <label class="f-ele-l">验证码</label>
+                            <input class="f-ele" type="text" name="code">
+                            <span class="code-img"></span>
+
+                            <input class="f-ele" type="hidden" name="captcha_id" value="">
+                        </div>
+                        <div class="f-ele-c">
+                            <div class="f-ele ">
+                                <label class="f-ele-l"></label>
+                                <input type="submit" class="button" value="登录">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="right-bar">
+            <div class="box other_login_container">
+                <div class="other_login_title">其它登录方式</div>
+                <div class="other_login_content">
+                    <a href="">微信登录</a>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<div class="sep20"></div>
+{{include "footer.html" .}}
+</body>
+
+<script>
+
+  jQuery(function ($) {
+
+    $("form").submit(function () {
+      $.post(
+        $(this).attr('action'),
+        $(this).serialize(),
+        function (data) {
+          console.log(data);
+          if (data.code === 0) {
+            gf.setCookie("gf-token", data.data.token, 2);
+            window.location.href = "/";
+          } else {
+            gf.setError(data.message);
+          }
+        }
+      );
+      return false;
+    });
+  })
+</script>
+
+
+<style>
+
+  .other_login_container {
+  }
+
+  .other_login_container .other_login_title {
+
+    padding: 10px;
+    font-size: 17px;
+    box-shadow: 0 1px 3px rgb(18 18 18 / 10%);
+  }
+
+  .other_login_container .other_login_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+  }
+
+  .other_login_container .other_login_content a {
+    display: inline-block;
+    text-align: left;
+    width: 80px;
+    padding: 10px;
+  }
+</style>
+
+</html>
+
+
+
+

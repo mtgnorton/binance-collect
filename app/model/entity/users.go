@@ -16,12 +16,13 @@ type Users struct {
 	Description         string      `json:"description"            ` // 简介
 	Password            string      `json:"password"               ` // MD5密码
 	Avatar              string      `json:"avatar"                 ` // 头像地址
-	Status              string      `json:"status"                 ` // 状态：000000  低位->高位 第一位为1 禁止登录,第二位为1 禁止发帖,第三位为1 禁止回复
+	Status              string      `json:"status"                 ` // 状态：disable_login | disable_posts | disable_reply
 	PostsAmount         uint        `json:"posts_amount"           ` // 创建主题次数
 	ReplyAmount         uint        `json:"reply_amount"           ` // 回复次数
 	ShieldedAmount      uint        `json:"shielded_amount"        ` // 被屏蔽次数
 	FollowByOtherAmount uint        `json:"follow_by_other_amount" ` // 被关注次数
 	TodayActivity       uint        `json:"today_activity"         ` // 今日活跃度
+	Balance             uint64      `json:"balance"                ` // 余额
 	Remark              string      `json:"remark"                 ` // 备注
 	LastLoginIp         string      `json:"last_login_ip"          ` // 最后登陆IP
 	LastLoginTime       *gtime.Time `json:"last_login_time"        ` // 最后登陆时间

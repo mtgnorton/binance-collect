@@ -1,0 +1,29 @@
+<!-- Custom CSS -->
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/css/common.css?v=2">
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.js"></script>
+<script src="/js/common.js?v=2"></script>
+<div class="header" id="header">
+    <div class="header-content">
+        <a href="/">
+            <img
+                    src="https://www.v2ex.com/static/img/v2ex@2x.png"
+                    height="30px"
+                    alt=""
+            />
+        </a>
+        <div class="header-right">
+            <a href="/"> 首页</a>
+            {{if .User.Username}}
+            <a href="/auth-logout">退出</a>
+            {{else}}
+            <a href="/register-html">注册</a>
+            <a href="/login-html">登录</a>
+            {{end}}
+
+        </div>
+    </div>
+</div>
+
+

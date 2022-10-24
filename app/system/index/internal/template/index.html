@@ -1,0 +1,76 @@
+<div class="main">
+    <div class="box index_nodes">
+        {{range $key,$item := .Data.nodes}}
+        <a href="/nodes?node={{$item.Id}}">{{$item.Name}}</a>
+        {{end}}
+
+    </div>
+    <div class="box">
+
+        {{range $key,$post := .Data.posts.List}}
+
+        <div class="post_wrapper">
+            <a href="/member">
+                <img
+                        src="https://cdn.v2ex.com/gravatar/97b1f718483b05ce388b24e33efc7c71?s=48&d=retro"
+                        class="avatar"
+                        alt=""
+                />
+            </a>
+            <div class="post_info_title_wrapper">
+                <a href="/posts-detail-html/{{$post.Id}}" class="post_title">{{$post.Title}}</a>
+
+                <span class="post_info">
+                  <a class="node" href="/node/{{$post.NodeName}}">{{$post.NodeName}}</a>
+
+                  <strong><a
+                          href="/member/{{$post.Username}}"> &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;{{$post.Username}}</a></strong>
+
+
+
+                  <span title="2022-09-21 16:42:38 +08:00">&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;{{$post.LastChangeTime}}</span>
+
+                   {{if $post.ReplyLastUsername}}
+                  <span> &nbsp;&nbsp;&nbsp;•&nbsp; 最后回复来自</span>
+                  <strong><a href="/member/JuSH">{{$post.ReplyLastUsername}}</a></strong>
+                    {{end}}
+                </span>
+            </div>
+
+            <a class="replies" href="/posts-detail-html/{{$post.Id}}"> {{$post.ReplyAmount}} </a>
+        </div>
+
+
+        {{end}}
+
+
+    </div>
+</div>
+
+<div class="right-bar">
+
+    {{include "./component/right-bar-user.html" .}}
+
+
+    {{include "./component/right-bar-ad.html" .}}
+
+    <div class="collect"></div>
+
+    {{include "./component/right-bar-hot.html" .}}
+
+    {{include "./component/right-bar-status.html" .}}
+
+
+</div>
+
+
+<style>
+
+
+
+
+
+
+
+</style>
+

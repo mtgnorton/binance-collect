@@ -1,21 +1,16 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"gf-admin/app/dao"
 	"gf-admin/app/dto"
-	"gf-admin/utility/custom_error"
 	"gf-admin/utility/response"
-	"reflect"
 	"strings"
 
 	"github.com/gogf/gf/v2/container/garray"
-	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
-	"github.com/gogf/gf/v2/util/gutil"
 )
 
 // 中间件管理服务
@@ -44,7 +39,7 @@ func (s *serviceMiddleware) OperationLog(r *ghttp.Request) {
 
 	path := r.URL.Path
 	pathName, err := dao.AdminMenu.Ctx(r.Context()).Where(g.Map{
-		dao.AdminMenu.Columns.Identification: strings.Replace(path, g.Cfg().MustGet(r.Context(), "server.prefix").String(), "", -1),
+		dao.AdminMenu.Columns.Identification: strings.Replace(path, g.Cfg().MustGet(r.Context(), "server.Prefix").String(), "", -1),
 	}).Value(dao.AdminMenu.Columns.Name)
 	if err != nil {
 		response.JsonErrorLogExit(r, err)
@@ -76,57 +71,6 @@ func (s *serviceMiddleware) OperationLog(r *ghttp.Request) {
 	}
 }
 
-// 返回处理中间件
-func (s *serviceMiddleware) ResponseHandler(r *ghttp.Request) {
-
-	buffers := bytes.NewBuffer([]byte(""))
-	g.DumpTo(buffers, r.GetMap(), gutil.DumpOption{})
-
-	g.Log().Infof(r.Context(), "请求的url为：%s,客户端端传递过来的参数如下", r.URL.Path)
-	g.Log().Infof(r.Context(), "%s", buffers)
-
-	r.Middleware.Next()
-
-	//系统运行时错误
-	if err := r.GetError(); err != nil {
-		r.Response.Status = 200
-		r.Response.ClearBuffer()
-		response.JsonErrorLogExit(r, err)
-	}
-
-	//如果已经有返回内容，那么该中间件什么也不做
-	if r.Response.BufferLength() > 0 {
-		return
-	}
-
-	var (
-		msg  string
-		res  interface{}
-		code gcode.Code = gcode.CodeOK
-	)
-
-	res = r.GetHandlerResponse()
-
-	if msg == "" {
-		if strings.Contains(r.URL.Path, "-update") {
-			msg = "更新成功"
-		} else if strings.Contains(r.URL.Path, "-delete") {
-			msg = "删除成功"
-		} else if strings.Contains(r.URL.Path, "-store") {
-			msg = "保存成功"
-		} else if strings.Contains(r.URL.Path, "-info") || strings.Contains(r.URL.Path, "-list") {
-			msg = "获取成功"
-		}
-	}
-
-	if res == nil || reflect.ValueOf(res).IsNil() {
-		response.JsonExit(r, code.Code(), msg, g.Map{})
-	}
-
-	response.JsonExit(r, code.Code(), msg, res)
-
-}
-
 func (s *serviceMiddleware) Auth(r *ghttp.Request) {
 
 	g.Log("auth").Debug(r.Context(), "是否登录验证中间件开始执行")
@@ -136,7 +80,7 @@ func (s *serviceMiddleware) Auth(r *ghttp.Request) {
 	}
 
 	if administrator.Id == 0 {
-		response.JsonErrorLogExit(r, custom_error.New("未登录或会话已过期，请您登录后再继续", g.Map{"administrator": administrator}))
+		response.JsonErrorLogExit(r, response.NewError("未登录或会话已过期，请您登录后再继续", g.Map{"administrator": administrator}))
 
 	}
 
@@ -147,13 +91,13 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 
 	administrator, err := AdminTokenInstance.GetAdministrator(r.Context())
 	if err != nil {
-		response.JsonErrorLogExit(r, custom_error.Wrap(err, "没有权限", g.Map{"administrator": administrator}))
+		response.JsonErrorLogExit(r, response.WrapError(err, "没有权限", g.Map{"administrator": administrator}))
 
 	}
 
 	url := r.Request.URL.Path
 	method := r.Request.Method
-	prefix, err := g.Cfg().Get(r.Context(), "server.prefix")
+	prefix, err := g.Cfg().Get(r.Context(), "server.Prefix")
 	if err != nil {
 		response.JsonErrorLogExit(r, err)
 	}
@@ -167,8 +111,12 @@ func (s *serviceMiddleware) Permission(r *ghttp.Request) {
 	}
 
 	isAllow, err := Enforcer.Auth(administrator.Username, path, method)
-	if err != nil || !isAllow {
-		response.JsonErrorLogExit(r, custom_error.Wrap(err, "没有权限", g.Map{"administrator": administrator}))
+	if err != nil {
+
+		response.JsonErrorLogExit(r, response.WrapError(err, "没有权限", g.Map{"administrator": administrator, "request path": path}))
+	}
+	if !isAllow {
+		response.JsonErrorLogExit(r, response.NewError("没有权限", g.Map{"administrator": administrator, "request path": path}))
 	}
 	r.Middleware.Next()
 }

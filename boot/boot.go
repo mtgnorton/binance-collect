@@ -22,7 +22,6 @@ const (
 )
 
 func init() {
-
 	ctx := context.TODO()
 	loadConfigFile(ctx)
 	newDefaultAdministrator(ctx)
@@ -46,7 +45,6 @@ func loadConfigFile(ctx context.Context) {
 	}
 	g.Log().Infof(ctx, "从命令行或环境变量中读取的环境参数为：%s", tempEnvName)
 	g.Log().Infof(ctx, "当前配置环境：%s", EnvName)
-
 }
 
 //系统启动时，判断是否存在管理员，如果不存在，则创建一个管理员

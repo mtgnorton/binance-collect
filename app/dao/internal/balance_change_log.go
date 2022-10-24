@@ -19,30 +19,30 @@ type BalanceChangeLogDao struct {
 
 // BalanceChangeLogColumns defines and stores column names for table forum_balance_change_log.
 type BalanceChangeLogColumns struct {
-	Id        string //
-	UserId    string // 用户id
-	Username  string // 用户名
-	Type      string // 每日登录奖励:login, 每日活跃度奖励: activity, 感谢主题: thanks_posts,感谢回复: thanks_relpy,创建主题: create_posts,创建回复: create_reply,初始奖励: init
-	Amount    string // 金额
-	Balance   string // 余额
-	PostsId   string // 关联主题id
-	RepliesId string // 关联回复id
-	Remark    string // 备注
-	CreatedAt string // 创建时间
+	Id         string //
+	UserId     string // 用户id
+	Username   string // 用户名
+	Type       string // 每日登录奖励:login, 每日活跃度奖励: activity, 感谢主题: thanks_posts,感谢回复: thanks_relpy,创建主题: create_posts,创建回复: create_reply,初始奖励: register
+	Amount     string // 金额
+	Before     string // 变动前余额
+	After      string // 变动后余额
+	RelationId string // 关联主题id或关联回复id
+	Remark     string // 备注
+	CreatedAt  string // 创建时间
 }
 
 //  BalanceChangeLogColumns holds the columns for table forum_balance_change_log.
 var balanceChangeLogColumns = BalanceChangeLogColumns{
-	Id:        "id",
-	UserId:    "user_id",
-	Username:  "username",
-	Type:      "type",
-	Amount:    "amount",
-	Balance:   "balance",
-	PostsId:   "posts_id",
-	RepliesId: "replies_id",
-	Remark:    "remark",
-	CreatedAt: "created_at",
+	Id:         "id",
+	UserId:     "user_id",
+	Username:   "username",
+	Type:       "type",
+	Amount:     "amount",
+	Before:     "before",
+	After:      "after",
+	RelationId: "relation_id",
+	Remark:     "remark",
+	CreatedAt:  "created_at",
 }
 
 // NewBalanceChangeLogDao creates and returns a new DAO object for table data access.

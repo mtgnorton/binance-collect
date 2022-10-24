@@ -10,11 +10,12 @@ import (
 
 // Nodes is the golang structure for table _nodes.
 type Nodes struct {
-	Id          uint        `json:"id"          ` //
-	Name        string      `json:"name"        ` // 节点名称
-	Description string      `json:"description" ` // 节点描述
-	IsIndex     int         `json:"is_index"    ` // 是否首页显示
-	IsCanEdit   int         `json:"is_can_edit" ` // 是否允许编辑
-	CreatedAt   *gtime.Time `json:"created_at"  ` // 创建时间
-	DeletedAt   *gtime.Time `json:"deleted_at"  ` // 删除时间
+	Id             uint        `json:"id"               ` //
+	Name           string      `json:"name"             ` // 节点名称
+	Description    string      `json:"description"      ` // 节点描述
+	IsIndex        int         `json:"is_index"         ` // 是否首页显示
+	IsDisabledEdit int         `json:"is_disabled_edit" ` // 是否禁用编辑和删除,1是 0否
+	Sort           int         `json:"sort"             ` // 显示顺序越小越靠前
+	CreatedAt      *gtime.Time `json:"created_at"       ` // 创建时间
+	DeletedAt      *gtime.Time `json:"deleted_at"       ` // 删除时间
 }

@@ -33,6 +33,7 @@ type wsService struct {
 
 //判断连接是否仍然存活
 func init() {
+	return
 	gtimer.AddSingleton(gctx.New(), time.Second*5, func(ctx context.Context) {
 
 		fmt.Println("clear开始运行")

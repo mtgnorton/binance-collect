@@ -20,6 +20,7 @@ type RepliesDao struct {
 // RepliesColumns defines and stores column names for table forum_replies.
 type RepliesColumns struct {
 	Id              string //
+	PostsId         string // 主题id
 	UserId          string // 用户id
 	Username        string // 用户名
 	RelationUserIds string // 涉及用户ids，多个以逗号分隔
@@ -27,6 +28,7 @@ type RepliesColumns struct {
 	CharacterAmount string // 字符长度
 	ThanksAmount    string // 感谢次数
 	ShieldedAmount  string // 被屏蔽次数
+	Status          string // 状态：no_audit, normal, shielded
 	CreatedAt       string // 创建时间
 	UpdatedAt       string // 更新时间
 	DeletedAt       string // 删除时间
@@ -35,6 +37,7 @@ type RepliesColumns struct {
 //  RepliesColumns holds the columns for table forum_replies.
 var repliesColumns = RepliesColumns{
 	Id:              "id",
+	PostsId:         "posts_id",
 	UserId:          "user_id",
 	Username:        "username",
 	RelationUserIds: "relation_user_ids",
@@ -42,6 +45,7 @@ var repliesColumns = RepliesColumns{
 	CharacterAmount: "character_amount",
 	ThanksAmount:    "thanks_amount",
 	ShieldedAmount:  "shielded_amount",
+	Status:          "status",
 	CreatedAt:       "created_at",
 	UpdatedAt:       "updated_at",
 	DeletedAt:       "deleted_at",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"gf-admin/app/dao"
 	"gf-admin/app/system/admin/internal/define"
-	"gf-admin/utility/custom_error"
+	"gf-admin/utility/response"
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -40,7 +40,7 @@ func (r *reply) List(ctx context.Context, in *define.ReplyListInput) (out *defin
 	out.Size = in.Size
 	out.Total, err = d.Count()
 	if err != nil {
-		return out, custom_error.New(err.Error())
+		return out, response.NewError(err.Error())
 	}
 	d = d.Page(in.Page, in.Size)
 	if in.OrderField != "" && in.OrderDirection != "" {

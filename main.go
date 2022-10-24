@@ -1,7 +1,8 @@
 package main
 
 import (
-	cmd "gf-admin/app/system/admin"
+	"gf-admin/app/system/admin"
+	"gf-admin/app/system/index"
 	_ "gf-admin/boot"
 
 	"github.com/gogf/gf/os/gctx"
@@ -11,5 +12,6 @@ import (
 
 func main() {
 
-	cmd.Run(gctx.New())
+	go index.Run(gctx.New())
+	admin.Run(gctx.New())
 }

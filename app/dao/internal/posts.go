@@ -19,46 +19,52 @@ type PostsDao struct {
 
 // PostsColumns defines and stores column names for table forum_posts.
 type PostsColumns struct {
-	Id               string //
-	NodeId           string // 节点id
-	UserId           string // 用户id
-	Username         string // 用户名
-	Title            string // 标题
-	Content          string // 内容
-	TopEndTime       string // 置顶截止时间,为空说明没有置顶
-	CharacterAmount  string // 字符长度
-	VisitsAmount     string // 访问次数
-	CollectionAmount string // 收藏次数
-	ReplyAmount      string // 回复次数
-	ThanksAmount     string // 感谢次数
-	ShieldedAmount   string // 被屏蔽次数
-	Weight           string // 权重
-	ReplyLastTime    string // 最后回复时间
-	CreatedAt        string // 主题创建时间
-	UpdatedAt        string // 主题更新时间
-	DeletedAt        string // 删除时间
+	Id                string //
+	NodeId            string // 节点id
+	UserId            string // 用户id
+	Username          string // 用户名
+	Title             string // 标题
+	Content           string // 内容
+	TopEndTime        string // 置顶截止时间,为空说明没有置顶
+	CharacterAmount   string // 字符长度
+	VisitsAmount      string // 访问次数
+	CollectionAmount  string // 收藏次数
+	ReplyAmount       string // 回复次数
+	ThanksAmount      string // 感谢次数
+	ShieldedAmount    string // 被屏蔽次数
+	Status            string // 状态：no_audit, normal, shielded
+	Weight            string // 权重
+	ReplyLastUserId   string // 最后回复用户id
+	ReplyLastUsername string // 最后回复用户名
+	ReplyLastTime     string // 最后回复时间
+	CreatedAt         string // 主题创建时间
+	UpdatedAt         string // 主题更新时间
+	DeletedAt         string // 删除时间
 }
 
 //  PostsColumns holds the columns for table forum_posts.
 var postsColumns = PostsColumns{
-	Id:               "id",
-	NodeId:           "node_id",
-	UserId:           "user_id",
-	Username:         "username",
-	Title:            "title",
-	Content:          "content",
-	TopEndTime:       "top_end_time",
-	CharacterAmount:  "character_amount",
-	VisitsAmount:     "visits_amount",
-	CollectionAmount: "collection_amount",
-	ReplyAmount:      "reply_amount",
-	ThanksAmount:     "thanks_amount",
-	ShieldedAmount:   "shielded_amount",
-	Weight:           "weight",
-	ReplyLastTime:    "reply_last_time",
-	CreatedAt:        "created_at",
-	UpdatedAt:        "updated_at",
-	DeletedAt:        "deleted_at",
+	Id:                "id",
+	NodeId:            "node_id",
+	UserId:            "user_id",
+	Username:          "username",
+	Title:             "title",
+	Content:           "content",
+	TopEndTime:        "top_end_time",
+	CharacterAmount:   "character_amount",
+	VisitsAmount:      "visits_amount",
+	CollectionAmount:  "collection_amount",
+	ReplyAmount:       "reply_amount",
+	ThanksAmount:      "thanks_amount",
+	ShieldedAmount:    "shielded_amount",
+	Status:            "status",
+	Weight:            "weight",
+	ReplyLastUserId:   "reply_last_user_id",
+	ReplyLastUsername: "reply_last_username",
+	ReplyLastTime:     "reply_last_time",
+	CreatedAt:         "created_at",
+	UpdatedAt:         "updated_at",
+	DeletedAt:         "deleted_at",
 }
 
 // NewPostsDao creates and returns a new DAO object for table data access.

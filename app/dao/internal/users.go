@@ -26,12 +26,13 @@ type UsersColumns struct {
 	Description         string // 简介
 	Password            string // MD5密码
 	Avatar              string // 头像地址
-	Status              string // 状态：000000  低位->高位 第一位为1 禁止登录,第二位为1 禁止发帖,第三位为1 禁止回复
+	Status              string // 状态：disable_login | disable_posts | disable_reply
 	PostsAmount         string // 创建主题次数
 	ReplyAmount         string // 回复次数
 	ShieldedAmount      string // 被屏蔽次数
 	FollowByOtherAmount string // 被关注次数
 	TodayActivity       string // 今日活跃度
+	Balance             string // 余额
 	Remark              string // 备注
 	LastLoginIp         string // 最后登陆IP
 	LastLoginTime       string // 最后登陆时间
@@ -54,6 +55,7 @@ var usersColumns = UsersColumns{
 	ShieldedAmount:      "shielded_amount",
 	FollowByOtherAmount: "follow_by_other_amount",
 	TodayActivity:       "today_activity",
+	Balance:             "balance",
 	Remark:              "remark",
 	LastLoginIp:         "last_login_ip",
 	LastLoginTime:       "last_login_time",

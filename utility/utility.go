@@ -165,7 +165,7 @@ func getCurrentAbPathByCaller() string {
 }
 
 // InitUnit 设置单元测试初始化操作,使用sqlite3数据库替代mysql
-func InitUnit() error {
+func InitUnit(useSqlite ...bool) error {
 
 	// 部分情况下会出现项目配置文件路径错误的情况，手动添加查询的配置路径
 	err := g.Cfg().GetAdapter().(*gcfg.AdapterFile).AddPath(gfile.Join(GetRootPath(), "config"))
@@ -174,6 +174,10 @@ func InitUnit() error {
 	}
 
 	g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetFileName("config-unit.toml")
+
+	if len(useSqlite) > 0 && useSqlite[0] == false {
+		return nil
+	}
 
 	// 初始化sqlite文件
 	sqliteBasePath := gfile.Join(GetRootPath(), "gf-admin-unit-base.db")
@@ -186,7 +190,6 @@ func InitUnit() error {
 		if err != nil {
 			return err
 		}
-
 	}
 
 	err = gfile.CopyFile(sqliteBasePath, sqliteInstancePath)

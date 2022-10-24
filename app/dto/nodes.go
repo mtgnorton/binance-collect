@@ -11,12 +11,13 @@ import (
 
 // Nodes is the golang structure of table forum_nodes for DAO operations like Where/Data.
 type Nodes struct {
-	g.Meta      `orm:"table:forum_nodes, do:true"`
-	Id          interface{} //
-	Name        interface{} // 节点名称
-	Description interface{} // 节点描述
-	IsIndex     interface{} // 是否首页显示
-	IsCanEdit   interface{} // 是否允许编辑
-	CreatedAt   *gtime.Time // 创建时间
-	DeletedAt   *gtime.Time // 删除时间
+	g.Meta         `orm:"table:forum_nodes, do:true"`
+	Id             interface{} //
+	Name           interface{} // 节点名称
+	Description    interface{} // 节点描述
+	IsIndex        interface{} // 是否首页显示
+	IsDisabledEdit interface{} // 是否禁用编辑和删除,1是 0否
+	Sort           interface{} // 显示顺序越小越靠前
+	CreatedAt      *gtime.Time // 创建时间
+	DeletedAt      *gtime.Time // 删除时间
 }

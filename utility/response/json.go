@@ -25,7 +25,6 @@ func Json(r *ghttp.Request, code int, message string, data ...interface{}) {
 	} else {
 		responseData = g.Map{}
 	}
-
 	r.Response.WriteJson(JsonRes{
 		Code:    code,
 		Message: message,
@@ -36,16 +35,24 @@ func Json(r *ghttp.Request, code int, message string, data ...interface{}) {
 
 func JsonErrorLogExit(r *ghttp.Request, err error) {
 
-	go custom_log.Log(r, err)
-
 	r.Response.ClearBuffer()
 
 	code := gerror.Code(err)
+
+	var data interface{}
+	data = g.Map{}
+
+	if code.Code() != gcode.CodeOK.Code() {
+		go custom_log.Log(r, err)
+	} else {
+		// 如果返回的code为0，说明是返回的成功消息,不记录日志，并且把相关数据返回给调用方
+		data = r.GetHandlerResponse()
+	}
 	if code == gcode.CodeNil && err != nil {
 		code = gcode.CodeInternalError
 	}
 
-	JsonExit(r, code.Code(), gerror.Current(err).Error())
+	JsonExit(r, code.Code(), gerror.Current(err).Error(), data)
 }
 
 // JsonExit 返回标准JSON数据并退出当前HTTP执行函数。

@@ -1,0 +1,361 @@
+<div class="main">
+
+
+    <div class="box post-container">
+
+
+        <div class="post-title-container bottom-line" style="position: relative">
+
+            <div class="post-crumb">
+                <a href="/">V2EX</a>
+                <span class="chevron">&nbsp;›&nbsp;</span>
+                <span>节点 &nbsp;</span>
+            </div>
+
+            <h2 class="title">
+                现在润美帝还是个好选择吗？
+            </h2>
+            <small class="post-info">
+                <a href="">b00tyhunt3r</a>
+                <span>·</span>
+                <span>7 小时 22 分钟前 </span>
+                <span>·</span>
+                <span>4480 次点击</span>
+            </small>
+
+            <img style="position: absolute;top:20px;right:20px;" class="avatar" width="70px" src="/image/img.png"
+                 alt="">
+
+        </div>
+
+        <p class="post-content bottom-line">
+            LZ 目前人在日本，随着最近 1 个十年汽油车的逐渐淘汰，日本的衰败感真是写在脸上了， 按刀计 lz 工资已接近腰斩。所以目前考虑离开日本在北美找找机会 因为有家人朋友在美帝所以加拿大不考虑
+
+            但现在唯一也是最担心的就是美帝的治安问题， 感觉这几年美帝枪击案真是越来越随机，越来越有抽奖的味道了。。家人朋友也是最担心哪天被抽中了大奖。。。
+            有没有目前就在美帝的前辈现身说法下，你们是怎么看待治安问题的？是否因为治安问题产生过离开美帝的想法？
+        </p>
+
+        <div class="post-action">
+            <small class="post-action-left">
+                <a href="">加入收藏</a>
+                <a href="">忽略主题</a>
+                <a href="">感谢</a>
+            </small>
+
+            <small class="post-action-right">
+                <span>
+                    4583 次点击
+                </span>
+                <span>·</span>
+                <span>
+                    17 人收藏
+                </span>
+            </small>
+
+        </div>
+
+    </div>
+
+    <div class="sep20">
+    </div>
+
+    <div class="comments-wrapper">
+
+
+        <div class="box comments-container">
+            <div class="comments-header bottom-line">
+                <div class="comments-header-left">
+                    <span>67 条回复</span>
+                    <span>·</span>
+                    <span>2022-10-22 22:56:33 +08:00</span>
+                </div>
+            </div>
+            <div class="comments">
+
+                {{range $key,$value := .Data.comments}}
+                <div class="comment-wrapper bottom-line">
+                    <img src="/image/img.png" class="avatar">
+                    <div class="comment">
+
+                        <div class="comment-top">
+                            <div class="comment-top-left">
+                                <a class="username" href="/member/Ashore">Ashore</a>
+                                <small>1 小时 36 分钟前</small>
+                                <small class="equipment">via Android</small>
+                                <span>
+                                <img src="/image/heart.png" class="heart" width="15px">
+
+                            <small>26</small>
+
+                            </span>
+                            </div>
+                            <div class="comment-top-right">
+                                <div class="shield_thank">
+                                    <a href="">屏蔽</a>
+                                    <a href="">感谢回复者</a>
+                                </div>
+                                <div class="comment-floor">
+                                    <a href="">
+                                        <img src="/image/reply.png" width="20px"
+                                             style="margin-right: 10px;vertical-align: middle"
+                                             alt="">
+                                    </a>
+                                    <span class="floor">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="comment-content">
+                            大内宣天天扯美帝这个危险那个水深火热还是有作用的
+                            <br>
+                            治安问题是个一两句说不清的问题，但是，大部分国人码农遇到最多吐槽最多的治安问题，跟枪支没有关系，是被砸车 /被小偷小摸 /被 homeless 喊了打了抢了
+                            <br>
+                            至于因为治安问题想离开美国的，我没听说，倒是知道不少找不到工作 /签证问题回国或者 relocate 的
+                            <br>
+                            想来美国最大的问题是签证，得有雇主要么愿意给你抽 h1b ，要么愿意 l1 带你过来，都很麻烦
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="sep20"></div>
+
+    <div class="box reply-container">
+
+        <div class="reply-header bottom-line">
+            <div class="reply-header-left">
+                <span>添加一条新回复</span>
+            </div>
+            <div class="reply-header-right">
+                <a href="#;" class="cancel-sticky">取消回复框停靠</a>
+                <a href="#header">回到顶部</a>
+            </div>
+        </div>
+
+        <form action="/comments-store">
+            <div class="problem" style="display: none">
+                请解决以下问题然后再提交：
+                <ul></ul>
+            </div>
+
+            <div class="reply-content">
+                <input type="hidden" name="post_id" value="{{post.}}">
+                <textarea name="" id="" cols="20" rows="8"></textarea>
+            </div>
+
+            <div class="reply-footer bottom-line">
+                <div class="reply-footer_left">
+                    <input type="submit" value="回复">
+                </div>
+                <div class="reply-footer_right">
+                    请尽量让自己的回复能够对别人有帮助
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+</div>
+
+<div class="right-bar">
+    {{include "./component/right-bar-user.html" .}}
+</div>
+
+<script>
+  $(".reply-content textarea").focus(function () {
+    $(".reply-container").addClass('sticky')
+  });
+
+  $('.cancel-sticky').click(function () {
+    $(".reply-container").removeClass('sticky')
+  })
+
+  jQuery(function ($) {
+
+    $("form").submit(function () {
+      $.post(
+        $(this).attr('action'),
+        $(this).serialize(),
+        function (data) {
+          if (data.code !== 0) {
+            gf.setError(data.message);
+          } else {
+            window.location.reload()
+          }
+        }
+      );
+      return false;
+    });
+  })
+</script>
+
+<style>
+
+  .post-title-container {
+    padding: 20px;
+  }
+
+  .post-crumb {
+    font-size: 15px;
+    line-height: 120%;
+    text-align: left;
+    /*overflow: auto;*/
+  }
+
+  .post-info {
+    color: var(--color-gray);
+  }
+
+  .post-info a {
+    color: var(--color-gray);
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 150%;
+    /*margin: 0 0 10px;*/
+    padding: 0;
+    line-break: anywhere;
+  }
+
+  .post-content {
+    font-size: 15px;
+    padding: 20px;
+    margin: 0px;
+    line-height: 1.6;
+    word-break: break-word;
+
+  }
+
+  .post-action {
+    display: flex;
+    justify-content: space-between;
+    line-height: 40px;
+    height: 40px;
+    padding: 0 20px;
+  }
+
+  .comments-header {
+    padding: 20px;
+    color: var(--color-gray);
+  }
+
+  .comment-wrapper {
+    display: flex;
+    padding: 15px;
+    position: relative;
+  }
+
+  .comment-wrapper .comment-top {
+    display: flex;
+    justify-content: space-between;
+    /*width: 100%;*/
+  }
+
+  .shield_thank {
+    display: inline-block;
+  }
+
+  .comment-floor {
+    display: inline-block;
+  }
+
+  .comment-wrapper .avatar {
+    width: 55px;
+    height: 55px;
+    margin-right: 15px;
+  }
+
+  .comment-top {
+    color: var(--color-fade);
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .comment-top-left .username {
+    margin-right: 25px;
+  }
+
+  .comment-top-left .equipment {
+    margin-right: 25px;
+  }
+
+  .comment-top-left .heart {
+    vertical-align: middle;
+  }
+
+  .comment-top-right .shield_thank {
+    margin-right: 20px;
+    visibility: hidden;
+  }
+
+  .comment-top-right:hover .shield_thank {
+    visibility: visible;
+  }
+
+  .comment-content {
+
+    font-size: 16px;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+
+  .sticky {
+    position: -webkit-sticky; /* safari 浏览器 */
+    position: sticky; /* 其他浏览器 */
+    bottom: 1px;
+  }
+
+  .reply-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .reply-content {
+    padding: 20px;
+    padding-right: 30px;
+  }
+
+  .reply-content textarea {
+    overflow: hidden;
+    overflow-wrap: break-word;
+    resize: none;
+    height: 112px;
+    border: 1px solid #ccc !important;
+    border-radius: 3px;
+    width: 100%;
+  }
+
+  .reply-content textarea:focus-visible {
+    outline: 1px solid #DBA901 !important;
+  }
+
+  .reply-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    line-height: 50px;
+    height: 50px;
+  }
+
+  .reply-footer_left {
+    flex: 0 0 80px;
+  }
+
+  .reply-footer_left input {
+    width: 100%;
+    background-color: #ffffff;
+  }
+
+
+</style>

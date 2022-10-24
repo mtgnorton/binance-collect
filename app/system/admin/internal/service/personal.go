@@ -44,7 +44,7 @@ func (p *personalService) Login(ctx context.Context, in define.PersonalLoginInpu
 	if err != nil {
 		return
 	}
-	if isVerifyCaptcha.Bool() && !Common.VerifyCaptcha(ctx, in.Code, in.CaptchaId) {
+	if isVerifyCaptcha.Bool() && !shared.Captcha.Verify(ctx, in.Code, in.CaptchaId) {
 		err = gerror.NewCode(gcode.CodeInvalidParameter, "验证码错误")
 		return
 	}

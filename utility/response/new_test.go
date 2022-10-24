@@ -1,4 +1,4 @@
-package custom_error
+package response
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ func Test_New_Wrap_Error(t *testing.T) {
 
 	//用户自定义错误
 	gtest.C(t, func(t *gtest.T) {
-		err := New("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
+		err := NewError("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
 		t.Assert(gerror.Current(err), "自定义错误")
 		contextInfo, err := getContextVariables(err)
 
@@ -24,8 +24,8 @@ func Test_New_Wrap_Error(t *testing.T) {
 	})
 	//包裹自定义错误
 	gtest.C(t, func(t *gtest.T) {
-		err := New("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
-		ew := Wrap(err, "包裹自定义错误", map[string]interface{}{"age": 18}, []string{"user"})
+		err := NewError("自定义错误", map[string]interface{}{"name": "jack"}, []string{"card"})
+		ew := WrapError(err, "包裹自定义错误", map[string]interface{}{"age": 18}, []string{"user"})
 		t.Assert(gerror.Current(ew), "包裹自定义错误")
 		contextInfo, err := getContextVariables(ew)
 		t.Assert(err, nil)
@@ -36,7 +36,7 @@ func Test_New_Wrap_Error(t *testing.T) {
 	gtest.C(t, func(t *gtest.T) {
 		e := errors.New("原始错误")
 
-		ew := Wrap(e, "包裹自定义错误", map[string]interface{}{"name": "jack"})
+		ew := WrapError(e, "包裹自定义错误", map[string]interface{}{"name": "jack"})
 
 		t.Assert(gerror.Current(ew), "包裹自定义错误")
 
@@ -48,7 +48,7 @@ func Test_New_Wrap_Error(t *testing.T) {
 	gtest.C(t, func(t *gtest.T) {
 
 		err := gerror.New("goframe 错误")
-		ew := Wrap(err, "")
+		ew := WrapError(err, "")
 		t.Assert(gerror.Current(ew), "未知错误")
 		contextInfo, err := getContextVariables(ew)
 		t.Assert(err, nil)

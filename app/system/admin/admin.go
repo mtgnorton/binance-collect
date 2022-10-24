@@ -1,4 +1,4 @@
-package cmd
+package admin
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 
 func Run(ctx context.Context) {
 	var (
-		s   = g.Server()
+		s   = g.Server("admin")
 		oai = s.GetOpenApi()
 	)
 
@@ -28,7 +28,7 @@ func Run(ctx context.Context) {
 	oai.Config.CommonResponseDataField = `Data`
 
 	// 静态目录设置
-	uploadPath := g.Cfg().MustGet(ctx, "upload.path").String()
+	uploadPath := g.Cfg().MustGet(ctx, "upload.BackendPath").String()
 	if uploadPath == "" {
 		g.Log().Fatal(ctx, "文件上传配置路径不能为空")
 	}
@@ -47,10 +47,11 @@ func Run(ctx context.Context) {
 		})
 	}
 
-	prefix, err := g.Cfg().Get(ctx, "server.prefix")
+	prefix, err := g.Cfg().Get(ctx, "server.Prefix")
 	if err != nil {
 		g.Log().Fatalf(ctx, "get server admin prefix error,error info following : %s", err)
 	}
+	g.Dump(prefix, "prefix")
 
 	service.AdminTokenInstance.Init(ctx)
 	// 前台系统路由注册
@@ -63,7 +64,7 @@ func Run(ctx context.Context) {
 			group.Middleware(
 				shared.Middleware.Ctx,
 				service.Middleware.OperationLog,
-				service.Middleware.ResponseHandler,
+				shared.Middleware.ResponseHandler,
 			)
 			//无需登录验证的路由
 
@@ -89,12 +90,14 @@ func Run(ctx context.Context) {
 						controller.Menu,
 						controller.Config,
 						controller.OperationLog,
+						controller.Node,
 					)
 				})
 			})
 		})
 
 	})
+
 	// 自定义丰富文档
 	enhanceOpenAPIDoc(s)
 	sessionConfig(s)
@@ -110,6 +113,8 @@ func Run(ctx context.Context) {
 
 	//controller.Ws.MonitorSystem(ctx)
 	// 启动Http Server
+	s.SetOpenApiPath("/admin/api.json")
+	s.SetSwaggerPath("/admin/swagger")
 	s.Run()
 }
 func sessionConfig(s *ghttp.Server) {
@@ -142,6 +147,7 @@ func enhanceOpenAPIDoc(s *ghttp.Server) {
 	openapi.Security = &goai.SecurityRequirements{
 		goai.SecurityRequirement{"ApiKeyAuth": []string{}},
 	}
+
 	// API description.
 	openapi.Info.Title = `gf-admin`
 	openapi.Info.Description = `后台接口文档`

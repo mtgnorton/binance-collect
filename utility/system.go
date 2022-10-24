@@ -1,3 +1,6 @@
+//go:build (darwin && arm64) || linux || windows
+// +build darwin,arm64 linux windows
+
 package utility
 
 import (
@@ -31,6 +34,7 @@ type CpuInfo struct {
 
 func GetCpuInfo() (info CpuInfo, err error) {
 	info = CpuInfo{}
+
 	before, err := cpu.Get()
 	if err != nil {
 		return
