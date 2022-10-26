@@ -175,7 +175,7 @@ CREATE TABLE `forum_follow_or_shield_user_relation`
     KEY `idx_target_user_id` (`target_user_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  ROW_FORMAT = DYNAMIC COMMENT ='论坛关注|屏蔽用户关联表';
+  ROW_FORMAT = DYNAMIC COMMENT ='论坛 关注|屏蔽  用户关联表';
 
 
 
@@ -188,12 +188,12 @@ CREATE TABLE `forum_thanks_or_shield_or_collect_content_relation`
     `target_id`       int(11) unsigned not null default 0 comment '被感谢｜屏蔽|收藏 主题id|回复id',
     `target_user_id`  int(11) unsigned not null default 0 comment '被感谢｜屏蔽|收藏 用户id',
     `target_username` varchar(45)      NOT NULL COMMENT '被感谢用户名',
-    `type`            char(10)         not null default '' comment '类型 感谢主题: thanks_posts,感谢回复: thanks_reply,屏蔽主题: shield_posts,屏蔽回复: shield_reply,收藏主题:collect_posts',
+    `type`            char(15)         not null default '' comment '类型 感谢主题: thanks_posts,感谢回复: thanks_reply,屏蔽主题: shield_posts,屏蔽回复: shield_reply,收藏主题:collect_posts',
     `created_at`      datetime                  DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `idx_user_id` (`user_id`) USING BTREE,
     KEY `idx_target_user_id` (`target_user_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  ROW_FORMAT = DYNAMIC COMMENT ='论坛感谢｜屏蔽|收藏  主题｜回复 关联表';
+  ROW_FORMAT = DYNAMIC COMMENT ='论坛 感谢｜屏蔽|收藏  主题｜回复 关联表';
 

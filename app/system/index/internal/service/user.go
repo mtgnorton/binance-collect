@@ -55,6 +55,37 @@ func (u *user) canReply(ctx context.Context, userId uint) (bool, error) {
 	return true, nil
 }
 
+// 用户是否收藏主题,如果id为0则表示未收藏
+func (u *user) WhetherCollectPost(ctx context.Context, userId, postId uint) (id uint, err error) {
+	// 判断是否已经收藏
+	return u.WhetherRelateToContent(ctx, userId, postId, model.ContentRelationTypeCollectPosts)
+}
+
+// 用户是否屏蔽主题，如果id为0则表示未屏蔽
+func (u *user) WhetherShieldPost(ctx context.Context, userId, postId uint) (id uint, err error) {
+	// 判断是否已经收藏
+	return u.WhetherRelateToContent(ctx, userId, postId, model.ContentRelationTypeShieldPosts)
+}
+
+// 用户是否感谢主题，如果id为0则表示未感谢
+func (u *user) WhetherThanksPost(ctx context.Context, userId, postId uint) (id uint, err error) {
+	// 判断是否已经收藏
+	return u.WhetherRelateToContent(ctx, userId, postId, model.ContentRelationTypeThanksPosts)
+}
+
+// 判断用户是否 感谢｜屏蔽|收藏 --> 主题｜回复
+func (u *user) WhetherRelateToContent(ctx context.Context, userId, targetId uint, relationType string) (id uint, err error) {
+
+	v, err := dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).Where(g.Map{
+		dao.ThanksOrShieldOrCollectContentRelation.Columns().UserId:   userId,
+		dao.ThanksOrShieldOrCollectContentRelation.Columns().TargetId: targetId,
+		dao.ThanksOrShieldOrCollectContentRelation.Columns().Type:     relationType,
+	}).Value(dao.ThanksOrShieldOrCollectContentRelation.Columns().Id)
+
+	return v.Uint(), err
+
+}
+
 func (u *user) balance(ctx context.Context, userId uint) (uint, error) {
 	balanceVar, err := dao.Users.Ctx(ctx).Where(dao.Users.Columns().Id, userId).Value(dao.Users.Columns().Balance)
 

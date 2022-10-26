@@ -20,7 +20,11 @@ func TimeFormatDivide24Hour(inputTime *gtime.Time) (show string, err error) {
 		pastTime := gtime.Now().Timestamp() - inputTime.Timestamp()
 		hour := pastTime / 3600
 		minute := (pastTime - hour*3600) / 60
-		show = fmt.Sprintf("%d小时%d分钟前", hour, minute)
+		if hour > 0 {
+			show = fmt.Sprintf("%d小时%d分钟前", hour, minute)
+		} else {
+			show = fmt.Sprintf("%d分钟前", minute)
+		}
 	} else {
 		show = inputTime.String()
 	}

@@ -219,3 +219,149 @@ func (p *posts) Detail(ctx context.Context, Id uint) (res *model.PostWithComment
 	err = dao.Posts.Ctx(ctx).WherePri(Id).WithAll().Scan(res)
 	return
 }
+
+// 访问主题后，进行的相关操作
+func (p *posts) Visit(ctx context.Context, postId uint) (err error) {
+	_, err = dao.Posts.Ctx(ctx).WherePri(postId).Increment(dao.Posts.Columns().VisitsAmount, 1)
+	return
+}
+
+// 用户收藏/取消主题
+func (p *posts) ToggleCollect(ctx context.Context, postId uint, userId uint, username string) (err error) {
+
+	d := dao.Posts.Ctx(ctx)
+	var post entity.Posts
+	err = d.WherePri(postId).Scan(&post)
+	if err != nil {
+		return
+	}
+	if post.Id == 0 {
+		return response.NewError("主题不存在")
+	}
+
+	relationId, err := User.WhetherCollectPost(ctx, userId, postId)
+
+	if err != nil {
+		return
+	}
+
+	if relationId == 0 {
+		err = d.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) (err error) {
+			_, err = d.WherePri(postId).Increment(dao.Posts.Columns().CollectionAmount, 1)
+			if err != nil {
+				return
+			}
+			_, err = dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).Insert(&entity.ThanksOrShieldOrCollectContentRelation{
+				UserId:         userId,
+				Username:       username,
+				TargetId:       postId,
+				TargetUserId:   post.UserId,
+				TargetUsername: post.Username,
+				Type:           model.ContentRelationTypeCollectPosts,
+			})
+			return
+		})
+	} else {
+		err = d.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) (err error) {
+			_, err = d.WherePri(postId).Decrement(dao.Posts.Columns().CollectionAmount, 1)
+			if err != nil {
+				return
+			}
+			_, err = dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).WherePri(relationId).Delete()
+			return
+		})
+	}
+
+	return
+}
+
+// 用户忽略/取消主题
+func (p *posts) ToggleShield(ctx context.Context, postId uint, userId uint, username string) (err error) {
+
+	d := dao.Posts.Ctx(ctx)
+	var post entity.Posts
+	err = d.WherePri(postId).Scan(&post)
+	if err != nil {
+		return
+	}
+	if post.Id == 0 {
+		return response.NewError("主题不存在")
+	}
+
+	relationId, err := User.WhetherShieldPost(ctx, userId, postId)
+
+	if err != nil {
+		return
+	}
+
+	if relationId == 0 {
+		err = d.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) (err error) {
+			_, err = d.WherePri(postId).Increment(dao.Posts.Columns().ShieldedAmount, 1)
+			if err != nil {
+				return
+			}
+			_, err = dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).Insert(&entity.ThanksOrShieldOrCollectContentRelation{
+				UserId:         userId,
+				Username:       username,
+				TargetId:       postId,
+				TargetUserId:   post.UserId,
+				TargetUsername: post.Username,
+				Type:           model.ContentRelationTypeShieldPosts,
+			})
+			return
+		})
+	} else {
+		err = d.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) (err error) {
+			_, err = d.WherePri(postId).Decrement(dao.Posts.Columns().ShieldedAmount, 1)
+			if err != nil {
+				return
+			}
+			_, err = dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).WherePri(relationId).Delete()
+			return
+		})
+	}
+
+	return
+}
+
+// 用户感谢主题
+func (p *posts) Thanks(ctx context.Context, postId uint, userId uint, username string) (err error) {
+
+	d := dao.Posts.Ctx(ctx)
+	var post entity.Posts
+	err = d.WherePri(postId).Scan(&post)
+	if err != nil {
+		return
+	}
+	if post.Id == 0 {
+		return response.NewError("主题不存在")
+	}
+
+	relationId, err := User.WhetherThanksPost(ctx, userId, postId)
+
+	if err != nil {
+		return
+	}
+
+	if relationId > 0 {
+		return response.NewError("您已经感谢过该主题")
+	}
+
+	err = d.Transaction(ctx, func(ctx context.Context, tx *gdb.TX) (err error) {
+		_, err = d.WherePri(postId).Increment(dao.Posts.Columns().ThanksAmount, 1)
+		if err != nil {
+			return
+		}
+		_, err = dao.ThanksOrShieldOrCollectContentRelation.Ctx(ctx).Insert(&entity.ThanksOrShieldOrCollectContentRelation{
+			UserId:         userId,
+			Username:       username,
+			TargetId:       postId,
+			TargetUserId:   post.UserId,
+			TargetUsername: post.Username,
+			Type:           model.ContentRelationTypeThanksPosts,
+		})
+		return
+	})
+
+	return
+}

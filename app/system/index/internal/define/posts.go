@@ -67,3 +67,27 @@ type PostsDetailReq struct {
 type PostsDetailRes struct {
 	g.Meta `mime:"text/html" type:"string" example:"<html/>"`
 }
+
+type PostsToggleCollectReq struct {
+	g.Meta `path:"/posts-toggle-collect" method:"post" summary:"收藏主题" tags:"主题相关"`
+	PostId uint `v:"required#主题id不能为空" json:"post_id"`
+}
+
+type PostsToggleCollectRes struct {
+}
+
+type PostsToggleShieldReq struct {
+	g.Meta `path:"/posts-toggle-shield" method:"post" summary:"忽略主题" tags:"主题相关"`
+	PostId uint `v:"required#主题id不能为空" json:"post_id"`
+}
+
+type PostsToggleShieldRes struct {
+}
+
+type PostsThanksReq struct {
+	g.Meta `path:"/posts-thanks" method:"post" summary:"感谢主题" tags:"主题相关"`
+	PostId uint `v:"required#主题id不能为空" json:"post_id"`
+}
+
+type PostsThanksRes struct {
+}

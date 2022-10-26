@@ -6,6 +6,7 @@ import (
 	"gf-admin/app/shared"
 	"gf-admin/app/system/index/internal/define"
 	"gf-admin/app/system/index/internal/service"
+	"gf-admin/utility"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -69,12 +70,39 @@ func (p *noAuth) PostsDetail(ctx context.Context, req *define.PostsDetailReq) (r
 	if err != nil {
 		return
 	}
+	post, err := service.Posts.Detail(ctx, req.PostId)
+
+	if err != nil {
+		return
+	}
+	err = service.Posts.Visit(ctx, req.PostId)
+	if err != nil {
+		return
+	}
+	g.View().BindFunc("TimeFormatDivide24Hour", utility.TimeFormatDivide24Hour)
+
+	isCollectPost, err := service.User.WhetherCollectPost(ctx, user.Id, req.PostId)
+	if err != nil {
+		return
+	}
+	isShieldPost, err := service.User.WhetherShieldPost(ctx, user.Id, req.PostId)
+	if err != nil {
+		return
+	}
+	isThankPost, err := service.User.WhetherThanksPost(ctx, user.Id, req.PostId)
+	if err != nil {
+		return
+	}
+
 	shared.View().Render(ctx, model.View{
 		Title:   "详情",
 		MainTpl: "posts-detail.html",
 		User:    user,
 		Data: g.Map{
-			"comments": []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			"Post":          post,
+			"IsCollectPost": isCollectPost,
+			"IsShieldPost":  isShieldPost,
+			"IsThankPost":   isThankPost,
 		},
 	})
 	return

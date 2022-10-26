@@ -14,7 +14,6 @@ var FrontTokenInstance = frontTokenHandle{ //如果直接在这里获取配置�
 
 type frontTokenHandle struct {
 	shared.TokenHandler
-	user       *model.UserSummary
 	loadConfig bool
 }
 
@@ -38,15 +37,10 @@ func (a *frontTokenHandle) GetUser(ctx context.Context) (user *model.UserSummary
 	if !a.loadConfig {
 		a.LoadConfig()
 	}
-
-	if a.user != nil && a.user.Id != 0 {
-		return a.user, nil
-	}
 	data := shared.Context.GetUser(ctx)
 	g.Dump("getUser", data)
 	user = &model.UserSummary{}
 	err = gconv.Scan(data, &user)
-	a.user = user
 	return
 }
 
@@ -60,6 +54,5 @@ func (a *frontTokenHandle) GetUserId(ctx context.Context) (userId uint, err erro
 }
 
 func (a *frontTokenHandle) Remove(ctx context.Context, token string) (err error) {
-	a.user = nil
 	return a.TokenHandler.Remove(ctx, token)
 }

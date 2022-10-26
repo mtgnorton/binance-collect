@@ -9,18 +9,19 @@
             <div class="post-crumb">
                 <a href="/">V2EX</a>
                 <span class="chevron">&nbsp;›&nbsp;</span>
-                <span>节点 &nbsp;</span>
+                <span>{{.Data.Post.Node.Name}} &nbsp;</span>
             </div>
 
             <h2 class="title">
-                现在润美帝还是个好选择吗？
-            </h2>
+                {{.Data.Post.Title}} </h2>
+
+
             <small class="post-info">
-                <a href="">b00tyhunt3r</a>
+                <a href="">{{.Data.Post.Username}}</a>
                 <span>·</span>
-                <span>7 小时 22 分钟前 </span>
+                <span>{{.Data.Post.CreatedAt | TimeFormatDivide24Hour}}</span>
                 <span>·</span>
-                <span>4480 次点击</span>
+                <span>{{.Data.Post.VisitsAmount}} 次点击</span>
             </small>
 
             <img style="position: absolute;top:20px;right:20px;" class="avatar" width="70px" src="/image/img.png"
@@ -29,26 +30,40 @@
         </div>
 
         <p class="post-content bottom-line">
-            LZ 目前人在日本，随着最近 1 个十年汽油车的逐渐淘汰，日本的衰败感真是写在脸上了， 按刀计 lz 工资已接近腰斩。所以目前考虑离开日本在北美找找机会 因为有家人朋友在美帝所以加拿大不考虑
 
-            但现在唯一也是最担心的就是美帝的治安问题， 感觉这几年美帝枪击案真是越来越随机，越来越有抽奖的味道了。。家人朋友也是最担心哪天被抽中了大奖。。。
-            有没有目前就在美帝的前辈现身说法下，你们是怎么看待治安问题的？是否因为治安问题产生过离开美帝的想法？
+            {{.Data.Post.Content}}
         </p>
 
         <div class="post-action">
             <small class="post-action-left">
-                <a href="">加入收藏</a>
-                <a href="">忽略主题</a>
-                <a href="">感谢</a>
+                {{if .Data.IsCollectPost}}
+                <a href="#;" class="toggle-collect">取消收藏</a>
+                {{else}}
+                <a href="#;" class="toggle-collect">加入收藏</a>
+                {{end}}
+
+                {{if ne .Data.Post.UserId .User.Id}}
+                {{if .Data.IsShieldPost}}
+                <a href="#;" class="toggle-shield-post">取消忽略</a>
+                {{else}}
+                <a href="#;" class="toggle-shield-post">忽略主题</a>
+                {{end}}
+
+                {{if .Data.IsThankPost}}
+                <span>感谢已发送</span>
+                {{else}}
+                <a href="#;" class="thanks">感谢</a>
+                {{end}}
+                {{end}}
             </small>
 
             <small class="post-action-right">
                 <span>
-                    4583 次点击
+                    {{.Data.Post.VisitsAmount}} 次点击
                 </span>
                 <span>·</span>
                 <span>
-                    17 人收藏
+                    {{.Data.Post.CollectionAmount}} 人收藏
                 </span>
             </small>
 
@@ -65,34 +80,47 @@
         <div class="box comments-container">
             <div class="comments-header bottom-line">
                 <div class="comments-header-left">
-                    <span>67 条回复</span>
+                    <span>{{.Data.Post.ReplyAmount}} 条回复</span>
                     <span>·</span>
-                    <span>2022-10-22 22:56:33 +08:00</span>
+                    <span>{{.Data.Post.ReplyLastTime}}</span>
                 </div>
             </div>
             <div class="comments">
 
-                {{range $key,$value := .Data.comments}}
+                {{range $key,$reply := .Data.Post.Replies}}
                 <div class="comment-wrapper bottom-line">
                     <img src="/image/img.png" class="avatar">
                     <div class="comment">
 
                         <div class="comment-top">
                             <div class="comment-top-left">
-                                <a class="username" href="/member/Ashore">Ashore</a>
-                                <small>1 小时 36 分钟前</small>
+                                <a class="username" href="/member/Ashore">{{$reply.Username}}</a>
+
+                                {{if eq $.Data.Post.UserId $reply.UserId}}
+                                <span class="op">OP</span>
+                                {{end}}
+
+                                <small>{{$reply.CreatedAt | TimeFormatDivide24Hour}}</small>
                                 <small class="equipment">via Android</small>
                                 <span>
+
+                            {{if $reply.ThanksAmount}}
                                 <img src="/image/heart.png" class="heart" width="15px">
 
-                            <small>26</small>
-
+                            <small>{{$reply.ThanksAmount}}</small>
+                            {{end}}
                             </span>
                             </div>
                             <div class="comment-top-right">
                                 <div class="shield_thank">
-                                    <a href="">屏蔽</a>
-                                    <a href="">感谢回复者</a>
+                                    {{if ne $reply.UserId $.User.Id}}
+
+                                    <a href="#;" class="shield_reply" data-reply-id="{{$reply.Id}}"
+                                       data-username="{{$reply.Username}}">屏蔽</a>
+                                    <a href="#;" class="thanks_reply" data-reply-id="{{$reply.Id}}"
+                                       data-username="{{$reply.Username}}">感谢回复者</a>
+                                    {{end}}
+
                                 </div>
                                 <div class="comment-floor">
                                     <a href="">
@@ -100,20 +128,14 @@
                                              style="margin-right: 10px;vertical-align: middle"
                                              alt="">
                                     </a>
-                                    <span class="floor">1</span>
+                                    <span class="floor">{{$key | plus 1}}</span>
                                 </div>
                             </div>
                         </div>
 
 
                         <div class="comment-content">
-                            大内宣天天扯美帝这个危险那个水深火热还是有作用的
-                            <br>
-                            治安问题是个一两句说不清的问题，但是，大部分国人码农遇到最多吐槽最多的治安问题，跟枪支没有关系，是被砸车 /被小偷小摸 /被 homeless 喊了打了抢了
-                            <br>
-                            至于因为治安问题想离开美国的，我没听说，倒是知道不少找不到工作 /签证问题回国或者 relocate 的
-                            <br>
-                            想来美国最大的问题是签证，得有雇主要么愿意给你抽 h1b ，要么愿意 l1 带你过来，都很麻烦
+                            {{$reply.Content}}
                         </div>
                     </div>
                 </div>
@@ -146,8 +168,9 @@
             </div>
 
             <div class="reply-content">
-                <input type="hidden" name="post_id" value="{{post.}}">
-                <textarea name="" id="" cols="20" rows="8"></textarea>
+                <input type="hidden" name="post_id" value="{{.Data.Post.Id}}">
+
+                <textarea name="content" id="" cols="20" rows="8"></textarea>
             </div>
 
             <div class="reply-footer bottom-line">
@@ -170,6 +193,8 @@
 </div>
 
 <script>
+  let postId = $('input[name="post_id"]').val();
+
   $(".reply-content textarea").focus(function () {
     $(".reply-container").addClass('sticky')
   });
@@ -178,6 +203,41 @@
     $(".reply-container").removeClass('sticky')
   })
 
+  $(".toggle-collect").click(function () {
+    $.post("/posts-toggle-collect", {post_id: postId}, function (res) {
+      if (res.code === 0) {
+        window.location.reload()
+      } else {
+        alert(res.message)
+      }
+    })
+  })
+  $(".toggle-shield-post").click(function () {
+    $.post("/posts-toggle-shield", {post_id: postId}, function (res) {
+      if (res.code === 0) {
+        window.location.reload()
+      } else {
+        alert(res.message)
+      }
+    })
+  })
+  $(".thanks").click(function () {
+    $.post("/posts-thanks", {post_id: postId}, function (res) {
+      if (res.code === 0) {
+        window.location.reload()
+      } else {
+        alert(res.message)
+      }
+    })
+  })
+
+  $(".shield_reply").click(function () {
+    let username = $(this).data("username")
+    let replyId = $(this).data("reply-id")
+    if (window.confirm("确认要不再显示来自 "+username+" 的这条回复？")) {
+
+    }
+  })
   jQuery(function ($) {
 
     $("form").submit(function () {
@@ -255,11 +315,16 @@
     position: relative;
   }
 
+  .comment {
+    width: 100%;
+  }
+
   .comment-wrapper .comment-top {
     display: flex;
     justify-content: space-between;
     /*width: 100%;*/
   }
+
 
   .shield_thank {
     display: inline-block;
@@ -282,7 +347,7 @@
   }
 
   .comment-top-left .username {
-    margin-right: 25px;
+    margin-right: 10px;
   }
 
   .comment-top-left .equipment {
@@ -291,6 +356,22 @@
 
   .comment-top-left .heart {
     vertical-align: middle;
+  }
+
+  .comment-top-left .op {
+    background-color: transparent;
+    color: #1484cd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    width: auto;
+    line-height: 1;
+    padding: 1px 3px;
+    border: 1px solid #1484cd;
+    border-radius: 3px;
+    margin-right: 10px;
+
   }
 
   .comment-top-right .shield_thank {
